@@ -10,6 +10,7 @@ use JsonApiRepository\Tests\Stubs\Model;
 
 class ResourceManagerUnitTest extends TestCase
 {
+    // For reference
     protected $includes = [
         'author', 
         'comments', 
@@ -32,6 +33,12 @@ class ResourceManagerUnitTest extends TestCase
 
         $this->comments->find('2')->relationships()
             ->add('author', ResourceIdentifier::create('people', '3'));
+
+        $this->people->find('2')->relationships()
+            ->add('posts', ResourceIdentifier::create('posts', '2'));
+
+        $this->people->find('2')->relationships()
+            ->add('posts', ResourceIdentifier::create('posts', '3'));
     }
 
     /** @test */
@@ -59,18 +66,26 @@ class ResourceManagerUnitTest extends TestCase
         // Execute
         $collection = $this->manager->newQuery()
                             ->setRelationships($this->posts->find('1')->relationships())
-                            ->includes('author', 'comments', 'comments.author')
+                            ->includes('author', 'comments', 'comments.author', 'comments.author.posts')
                             ->query();
 
         // Assert
         $this->assertInstanceOf(ResourceCollection::class, $collection);
-        $this->assertCount(5, $collection);
+        $this->assertCount(7, $collection);
         $this->assertTrue(
             $collection->exists('people', '1') &&
             $collection->exists('comments', '1') &&
             $collection->exists('comments', '2') &&
             $collection->exists('people', '2') &&
-            $collection->exists('people', '3')
+            $collection->exists('people', '3') &&
+            $collection->exists('posts', '2') &&
+            $collection->exists('posts', '3')
         );
+    }
+
+    /** @test */
+    public function it_handles_an_undefined_relationship()
+    {
+        $this->markAsRisky();
     }
 }

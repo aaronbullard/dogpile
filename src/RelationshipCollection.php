@@ -37,6 +37,10 @@ class RelationshipCollection
 
     public function resourceIdentifiersFor(string $relationshipType): array
     {
+        if(false == in_array($relationshipType, $this->listRelationships())){
+            return [];
+        }
+
         return array_values($this->relatives[$relationshipType]);
     }
 
