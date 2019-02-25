@@ -1,0 +1,35 @@
+{
+    "name": "aaronbullard/jsonapi-repo",
+    "type": "library",
+    "license": "MIT",
+    "description": "",
+    "keywords": [],
+    "authors": [
+        {
+            "name": "Aaron Bullard",
+            "email": "aaron.bullard77@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.3",
+        "fzaninotto/faker": "^1.8",
+        "mockery/mockery": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "JsonApiRepository\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests"
+        ],
+        "files": ["tests/helpers.php"]
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit --colors=always --coverage-html=./coverage --coverage-text=tests/summary.txt"
+    }
+}
