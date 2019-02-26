@@ -19,5 +19,5 @@ interface ResourceRepository
      * @param array $ids
      * @return array
      */
-    public function findHavingIds(array $ids): array;
+    public function findHavingIds(array $ids): ResourceCollection;
 }

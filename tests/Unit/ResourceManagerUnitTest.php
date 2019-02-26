@@ -84,6 +84,24 @@ class ResourceManagerUnitTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_nested_includes_by_themselves()
+    {
+        // Execute
+        $collection = $this->manager->newQuery()
+                            ->setRelationships($this->posts->find('1')->relationships())
+                            ->includes('comments.author.posts')
+                            ->query();
+
+        // Assert
+        $this->assertInstanceOf(ResourceCollection::class, $collection);
+        $this->assertCount(2, $collection);
+        $this->assertTrue(
+            $collection->exists('posts', '2') &&
+            $collection->exists('posts', '3')
+        );
+    }
+
+    /** @test */
     public function it_handles_an_undefined_relationship()
     {
         $this->markAsRisky();

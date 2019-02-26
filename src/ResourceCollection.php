@@ -26,6 +26,15 @@ class ResourceCollection implements Countable
         return $this;
     }
 
+    public function merge(ResourceCollection $collection): ResourceCollection
+    {
+        $resources = $collection->toArray();
+
+        $this->add(...$resources);
+
+        return $this;
+    }
+
     public function listTypes(): array
     {
         return array_keys($this->collection);
@@ -58,6 +67,17 @@ class ResourceCollection implements Countable
         }
 
         return $this->collection[$type][$id];
+    }
+
+    public function relationships(): RelationshipCollection
+    {
+        $relationships = new RelationshipCollection();
+
+        foreach($this->toArray() as $resource){
+            $relationships->merge($resource->relationships());
+        }
+
+        return $relationships;
     }
 
     public function toArray(): array

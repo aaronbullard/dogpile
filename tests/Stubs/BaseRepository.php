@@ -3,6 +3,7 @@
 namespace JsonApiRepository\Tests\Stubs;
 
 use JsonApiRepository\ResourceRepository;
+use JsonApiRepository\ResourceCollection;
 
 abstract class BaseRepository implements ResourceRepository
 {
@@ -38,10 +39,12 @@ abstract class BaseRepository implements ResourceRepository
      * @param array $ids
      * @return array
      */
-    public function findHavingIds(array $ids): array
+    public function findHavingIds(array $ids): ResourceCollection
     {
-        return array_map(function($id){
+        $models = array_map(function($id){
             return $this->find($id);
         }, $ids);
+
+        return new ResourceCollection(...$models);
     }
 }

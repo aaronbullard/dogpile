@@ -27,7 +27,7 @@ class QueryHandler
     {
         // filter previously queried objects
         $filtered = array_filter($identifiers, function($item) {
-            return !$this->collection->exists($item->type(), $item->id());
+            return $this->collection->exists($item->type(), $item->id()) === false;
         });
 
         // incase for some reason not all identifiers are of the same type, we'll separate them first
@@ -41,26 +41,33 @@ class QueryHandler
         }
 
         // query
-        $relCollection = new RelationshipCollection();
+        $relationships = new RelationshipCollection();
 
         foreach($this->ids as $type => $ids){
-            $resources = $this->manager->repositoryFor($type)->findHavingIds($this->ids[$type]);
+            $collection = $this->manager->repositoryFor($type)->findHavingIds($this->ids[$type]);
             
-            $this->collection->add(...$resources);
+            $relationships->merge($collection->relationships());
             
-            foreach($resources as $resource){
-                $relCollection->merge($resource->relationships());
-            }
+            $this->collection->merge($collection);
+
+            unset($collection);
         }
 
         if(is_array($this->next)){
             foreach($this->next as $include => $next){
                 $handler = new static($this->manager, $this->collection);
+
                 $handler->next($next);
-                $identifiers = $relCollection->resourceIdentifiersFor($include);
+
+                $identifiers = $relationships->resourceIdentifiersFor($include);
+
                 $handler->find(...$identifiers);
+
+                unset($handler);
             }
         }
+
+        unset($relationships);
 
         return $this->collection;
     }
