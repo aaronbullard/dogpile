@@ -4,9 +4,7 @@ namespace JsonApiRepository\Tests\Unit;
 
 use JsonApiRepository\Tests\TestCase;
 use JsonApiRepository\ResourceIdentifier;
-// use JsonApiRepository\ResourceObject;
 use JsonApiRepository\IncludesCollection;
-use JsonApiRepository\Tests\Stubs\Model;
 
 class IncludesCollectionUnitTest extends TestCase
 {

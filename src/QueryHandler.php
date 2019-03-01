@@ -6,69 +6,60 @@ class QueryHandler
 {
     protected $manager;
 
-    protected $collection;
+    protected $includes;
 
-    protected $ids = [];
+    protected $resouces;
 
-    public function __construct(ResourceManager $manager, ResourceCollection $collection)
+    public function __construct(ResourceManager $manager, IncludesCollection $includes, ResourceCollection $resources)
     {
-        $this->manager = $manager;
-        $this->collection = $collection;
+        $this->manager      = $manager;
+        $this->includes     = $includes;
+        $this->resources    = $resources;
     }
 
-    public function next($next): QueryHandler
+    public static function create(ResourceManager $manager, IncludesCollection $includes, ResourceCollection $resources): QueryHandler
     {
-        $this->next = $next;
-
-        return $this;
+        return new static($manager, $includes, $resources);
     }
 
-    public function find(ResourceIdentifier ...$identifiers): ResourceCollection
+    public function resolve(string $path)
     {
-        // filter previously queried objects
-        $filtered = array_filter($identifiers, function($item) {
-            return $this->collection->exists($item->type(), $item->id()) === false;
-        });
+        // If recursion brought us to the root, stop
+        if($this->includes->isRoot($path)){
+            return;
+        }
 
-        // incase for some reason not all identifiers are of the same type, we'll separate them first
-        foreach($filtered as $identifier){
-            // Check to initialize array if not already
-            if(!isset($this->ids[$identifier->type()])){
-                $this->ids[$identifier->type()] = [];
+        // do we have the identifiers 
+        if(!$this->includes->has($path)){
+            // (inception...) Let's get resources for our parent
+            $this->resolve($this->includes->parent($path));
+        }
+
+        // get identifiers, do we have resources?
+        $identifiers = $this->includes->identifiersFor($path)
+                            ->filter(function($identifier){
+                                return false === $this->resources->has($identifier->type(), $identifier->id());
+                            });
+
+        // Identifiers may be mixed types, need to separate, query, then join
+        $types = $identifiers->map(function($identifier){ return $identifier->type(); })->unique();
+
+        foreach($types as $type){
+            $ids = $identifiers->map(function($identifier){ return $identifier->id(); })->values()->toArray();
+
+            $resources = $this->manager->repositoryFor($type)->findHavingIds($ids);
+
+            // Add new identifiers to IncludesCollection for other queries
+            foreach($resources->relationships()->listRelationships() as $relationshipType){
+                $newPath = sprintf("%s.%s", $path, $relationshipType);
+
+                $relatedIdentifiers = $resources->relationships()->resourceIdentifiersFor($relationshipType);
+
+                $this->includes->add($newPath, ...$relatedIdentifiers);
             }
 
-            $this->ids[$identifier->type()][] = $identifier->id();
+            // Add resources to ResourcesCollection
+            $this->resources->merge($resources);
         }
-
-        // query
-        $relationships = new RelationshipCollection();
-
-        foreach($this->ids as $type => $ids){
-            $collection = $this->manager->repositoryFor($type)->findHavingIds($this->ids[$type]);
-            
-            $relationships->merge($collection->relationships());
-            
-            $this->collection->merge($collection);
-
-            unset($collection);
-        }
-
-        if(is_array($this->next)){
-            foreach($this->next as $include => $next){
-                $handler = new static($this->manager, $this->collection);
-
-                $handler->next($next);
-
-                $identifiers = $relationships->resourceIdentifiersFor($include);
-
-                $handler->find(...$identifiers);
-
-                unset($handler);
-            }
-        }
-
-        unset($relationships);
-
-        return $this->collection;
-    }
+    }   
 }

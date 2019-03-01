@@ -6,75 +6,70 @@ class QueryBuilder
 {
     protected $manager;
 
-    protected $relationships;
-
     protected $includes;
 
-    protected $collection;
+    protected $resources;
+
+    protected $paths;
 
     public function __construct(ResourceManager $manager)
     {
         $this->manager      = $manager;
-        $this->collection   = new ResourceCollection();
+        $this->includes     = new IncludesCollection();
+        $this->resources    = new ResourceCollection();
+    }
+
+    public function includesCollection(): IncludesCollection
+    {
+        return $this->includess;
+    }
+
+    public function resourceCollection(): ResourceCollection
+    {
+        return $this->resources;
     }
 
     public function setRelationships(RelationshipCollection $relationships): QueryBuilder
     {
         $this->relationships = $relationships;
 
+        foreach($relationships->listRelationships() as $path){
+            $this->includes->add($path, ...$relationships->resourceIdentifiersFor($path));
+        }
+
         return $this;
     }
 
-    public function includes(string ...$includes): QueryBuilder
+    public function includes(string ...$paths): QueryBuilder
     {
-        $this->includes = static::parseIncludes(...$includes);
+        // Sorting allows parents to go before children e.g. author, author.comments
+        sort($paths);
+
+        $this->paths = $paths;
 
         return $this;
     }
 
     public function query(): ResourceCollection
     {
-        foreach($this->includes as $include => $next){
-            $handler = new QueryHandler($this->manager, $this->collection);
-            
-            $handler->next($next);
-
-            $identifiers = $this->relationships->resourceIdentifiersFor($include);
-
-            $handler->find(...$identifiers);
+        foreach($this->paths as $path){
+            QueryHandler::create($this->manager, $this->includes, $this->resources)->resolve($path);
         }
 
-        return $this->collection;
+        // get identifiers for just the includes that were requested
+        $identifiers = new Collection();
+        foreach($this->paths as $path){
+            $identifiers = $this->includes->identifiersFor($path)->merge($identifiers);
+        }
+
+        // return back a collectoin of resources that were requested
+        $resources = new ResourceCollection();
+        foreach($identifiers as $identifier){
+            $resources->add(
+                $this->resources->find($identifier->type(), $identifier->id())
+            );
+        }
+
+        return $resources;
     }
-
-    public static function parseIncludes(string ...$includes): array
-    {
-        sort($includes);
-
-        $array = [];
-
-        foreach($includes as $include){
-            $array[$include] = null;
-        }
-
-        $newArray = array();
-
-        foreach($array as $key => $value) {
-            $dots = explode(".", $key);
-
-            if(count($dots) > 1) {
-                $last = &$newArray[ $dots[0] ];
-                foreach($dots as $k => $dot) {
-                    if($k == 0) continue;
-                    $last = &$last[$dot];
-                }
-                $last = $value;
-            } else {
-                $newArray[$key] = $value;
-            }
-        }
-
-        return $newArray;
-    }
-
 }

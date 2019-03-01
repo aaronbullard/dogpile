@@ -47,7 +47,7 @@ class ResourceCollection implements Countable
         }, 0);
     }
 
-    public function exists(string $type, string $id): bool
+    public function has(string $type, string $id): bool
     {
         if(!isset($this->collection[$type])){
             return false;
@@ -62,7 +62,7 @@ class ResourceCollection implements Countable
 
     public function find(string $type, string $id)
     {
-        if($this->exists($type, $id) === false){
+        if($this->has($type, $id) === false){
             throw NotFoundException::resource($type, $id);
         }
 

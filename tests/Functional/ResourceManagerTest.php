@@ -8,7 +8,7 @@ use JsonApiRepository\ResourceCollection;
 use JsonApiRepository\ResourceIdentifier;
 use JsonApiRepository\Tests\Stubs\Model;
 
-class ResourceManagerUnitTest extends TestCase
+class ResourceManagerTest extends TestCase
 {
     // For reference
     protected $includes = [
@@ -47,16 +47,16 @@ class ResourceManagerUnitTest extends TestCase
         // Execute
         $collection = $this->manager->newQuery()
                             ->setRelationships($this->posts->find('1')->relationships())
-                            ->includes('author', 'comments')
+                            ->includes('zebra', 'author', 'comments')
                             ->query();
 
         // Assert
         $this->assertInstanceOf(ResourceCollection::class, $collection);
         $this->assertCount(3, $collection);
         $this->assertTrue(
-            $collection->exists('people', '1') &&
-            $collection->exists('comments', '1') &&
-            $collection->exists('comments', '2')
+            $collection->has('people', '1') &&
+            $collection->has('comments', '1') &&
+            $collection->has('comments', '2')
         );
     }
 
@@ -73,13 +73,13 @@ class ResourceManagerUnitTest extends TestCase
         $this->assertInstanceOf(ResourceCollection::class, $collection);
         $this->assertCount(7, $collection);
         $this->assertTrue(
-            $collection->exists('people', '1') &&
-            $collection->exists('comments', '1') &&
-            $collection->exists('comments', '2') &&
-            $collection->exists('people', '2') &&
-            $collection->exists('people', '3') &&
-            $collection->exists('posts', '2') &&
-            $collection->exists('posts', '3')
+            $collection->has('people', '1') &&
+            $collection->has('comments', '1') &&
+            $collection->has('comments', '2') &&
+            $collection->has('people', '2') &&
+            $collection->has('people', '3') &&
+            $collection->has('posts', '2') &&
+            $collection->has('posts', '3')
         );
     }
 
@@ -96,8 +96,8 @@ class ResourceManagerUnitTest extends TestCase
         $this->assertInstanceOf(ResourceCollection::class, $collection);
         $this->assertCount(2, $collection);
         $this->assertTrue(
-            $collection->exists('posts', '2') &&
-            $collection->exists('posts', '3')
+            $collection->has('posts', '2') &&
+            $collection->has('posts', '3')
         );
     }
 

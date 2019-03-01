@@ -2,10 +2,10 @@
 
 namespace JsonApiRepository;
 
-use Tightenco\Collect\Support\Collection;
-
 class IncludesCollection
 {
+    const ROOT = "$";
+
     protected $items = [];
 
     public function add(string $path, ResourceIdentifier ...$identities): IncludesCollection
@@ -28,9 +28,21 @@ class IncludesCollection
         return isset($this->items[$path]);
     }
 
-    public function identifiersFor(string $path): array
+    public function hasParent(string $path): bool
     {
-        return $this->has($path) ? $this->items[$path] : [];
+        return static::parent($path) !== static::ROOT;
+    }
+
+    public function isRoot(string $path): bool
+    {
+        return $path === static::ROOT;
+    }
+
+    public function identifiersFor(string $path): Collection
+    {
+        return $this->has($path) 
+            ? new Collection(array_values($this->items[$path]))
+            : new Collection();
     }
 
     public function toArray(): array
@@ -45,7 +57,7 @@ class IncludesCollection
         $arr = explode('.', $path);
 
         if(count($arr) == 1){
-            return '$';
+            return static::ROOT;
         }
 
         unset($arr[count($arr) - 1]);
