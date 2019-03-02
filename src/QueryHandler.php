@@ -22,7 +22,7 @@ class QueryHandler
         return new static($manager, $includes, $resources);
     }
 
-    public function resolve(string $path)
+    public function resolve(string $path): void
     {
         // If recursion brought us to the root, stop
         if($this->includes->isRoot($path)){
@@ -35,31 +35,34 @@ class QueryHandler
             $this->resolve($this->includes->parent($path));
         }
 
-        // get identifiers, do we have resources?
-        $identifiers = $this->includes->identifiersFor($path)
-                            ->filter(function($identifier){
-                                return false === $this->resources->has($identifier->type(), $identifier->id());
-                            });
+        $this->includes->identifiersFor($path)
+            // filter out identifiers for resources we already have
+            ->filter(function($identifier){
+                return false === $this->resources->has($identifier->type(), $identifier->id());
+            })
+            // group identifiers by their type for group querying
+            ->groupBy(function($identifier){ return $identifier->type(); })
+            // map Identifiers to Resources
+            ->map(function($identifiers, $type){
+                return $this->manager->repositoryFor($type)->findHavingIds(
+                    $identifiers->map(function($identifier){ return $identifier->id(); })->toArray()
+                );
+            })
+            // get rid of hash grouping by type
+            ->flatten()
+            // update IncludesCollection with new child relationships for other queries
+            ->each(function($resources) use ($path){
+                foreach($resources->relationships()->listRelationships() as $relationshipType){
+                    $newPath = sprintf("%s.%s", $path, $relationshipType);
 
-        // Identifiers may be mixed types, need to separate, query, then join
-        $types = $identifiers->map(function($identifier){ return $identifier->type(); })->unique();
+                    $relatedIdentifiers = $resources->relationships()->resourceIdentifiersFor($relationshipType);
 
-        foreach($types as $type){
-            $ids = $identifiers->map(function($identifier){ return $identifier->id(); })->values()->toArray();
-
-            $resources = $this->manager->repositoryFor($type)->findHavingIds($ids);
-
-            // Add new identifiers to IncludesCollection for other queries
-            foreach($resources->relationships()->listRelationships() as $relationshipType){
-                $newPath = sprintf("%s.%s", $path, $relationshipType);
-
-                $relatedIdentifiers = $resources->relationships()->resourceIdentifiersFor($relationshipType);
-
-                $this->includes->add($newPath, ...$relatedIdentifiers);
-            }
-
-            // Add resources to ResourcesCollection
-            $this->resources->merge($resources);
-        }
+                    $this->includes->add($newPath, ...$relatedIdentifiers);
+                }
+            })
+            // roll new resources into the ResourceCollection singleton
+            ->each(function($resources){
+                $this->resources->merge($resources);
+            });
     }   
 }

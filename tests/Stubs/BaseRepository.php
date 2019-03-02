@@ -4,6 +4,7 @@ namespace JsonApiRepository\Tests\Stubs;
 
 use JsonApiRepository\ResourceRepository;
 use JsonApiRepository\ResourceCollection;
+use JsonApiRepository\NotFoundException;
 
 abstract class BaseRepository implements ResourceRepository
 {
@@ -28,6 +29,10 @@ abstract class BaseRepository implements ResourceRepository
 
     public function find(string $id): Model
     {
+        if(!isset($this->models[$id])){
+            throw NotFoundException::resource($this->resourceType(), $id);
+        }
+
         return $this->models[$id];
     }
 

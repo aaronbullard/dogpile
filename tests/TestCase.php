@@ -9,6 +9,7 @@ use JsonApiRepository\Tests\Stubs\Model;
 use JsonApiRepository\Tests\Stubs\PostsRepository;
 use JsonApiRepository\Tests\Stubs\PeopleRepository;
 use JsonApiRepository\Tests\Stubs\CommentsRepository;
+use JsonApiRepository\Tests\Stubs\UsersRepository;
 
 class TestCase extends PHPUnitTestCase
 {
@@ -28,21 +29,28 @@ class TestCase extends PHPUnitTestCase
         );
 
         $this->people = new PeopleRepository(
-            Model::create('people', '1'),
-            Model::create('people', '2'),
-            Model::create('people', '3')
+            Model::create('people', '11'),
+            Model::create('people', '12'),
+            Model::create('people', '13')
         );
 
         $this->comments = new CommentsRepository(
-            Model::create('comments', '1'),
-            Model::create('comments', '2'),
-            Model::create('comments', '3')
+            Model::create('comments', '101'),
+            Model::create('comments', '102'),
+            Model::create('comments', '103')
+        );
+
+        $this->users = new UsersRepository(
+            Model::create('users', '21'),
+            Model::create('users', '22'),
+            Model::create('users', '23')
         );
 
         $this->manager = new ResourceManager(
             $this->posts,
             $this->people,
-            $this->comments
+            $this->comments,
+            $this->users
         );
     }
 

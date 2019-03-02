@@ -6,7 +6,7 @@ class NotFoundException extends \RuntimeException
 {
     public static function resource(string $type, string $id): NotFoundException
     {
-        $message = sprintf("Could not find Resource of type %s and with id %s", $type, $id);
+        $message = sprintf("Could not find Resource of type '%s' and with id '%s'", $type, $id);
 
         return new self($message);
     }

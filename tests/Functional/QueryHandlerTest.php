@@ -2,13 +2,9 @@
 
 namespace JsonApiRepository\Tests\Functional;
 
-use Mockery;
 use JsonApiRepository\Tests\TestCase;
-use JsonApiRepository\Tests\Stubs\Model;
-use JsonApiRepository\Collection;
 use JsonApiRepository\QueryHandler;
 use JsonApiRepository\ResourceIdentifier as Ident;
-use JsonApiRepository\ResourceManager;
 use JsonApiRepository\ResourceCollection;
 use JsonApiRepository\IncludesCollection;
 
@@ -25,22 +21,22 @@ class QueryHandlerTest extends TestCase
     /** @test */
     public function it_queries_relationships()
     {
-        $this->resources->add($this->comments->find('1'));
+        $this->resources->add($this->comments->find('101'));
 
         // Give a relationship to a comment to test if it gets logged with the includes
-        $this->comments->find('2')->relationships()->add('author', Ident::create('people', '1'));
+        $this->comments->find('102')->relationships()->add('author', Ident::create('people', '11'));
 
         $this->includes->add('comments', 
-            Ident::create('comments', '1'),
-            Ident::create('comments', '2'),
-            Ident::create('comments', '3')
+            Ident::create('comments', '101'),
+            Ident::create('comments', '102'),
+            Ident::create('comments', '103')
         );
 
         $this->handler->resolve('comments');
 
-        $this->assertTrue($this->resources->has('comments', '1'));
-        $this->assertTrue($this->resources->has('comments', '2'));
-        $this->assertTrue($this->resources->has('comments', '3'));
+        $this->assertTrue($this->resources->has('comments', '101'));
+        $this->assertTrue($this->resources->has('comments', '102'));
+        $this->assertTrue($this->resources->has('comments', '103'));
         $this->assertTrue($this->includes->has('comments'));
         $this->assertTrue($this->includes->has('comments.author'));
     }
