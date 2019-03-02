@@ -35,7 +35,7 @@ class QueryHandler
             $this->resolve($this->includes->parent($path));
         }
 
-        $this->includes->identifiersFor($path)
+        $resources = $this->includes->identifiersFor($path)
             // filter out identifiers for resources we already have
             ->filter(function($identifier){
                 return false === $this->resources->has($identifier->type(), $identifier->id());
@@ -50,19 +50,20 @@ class QueryHandler
             })
             // get rid of hash grouping by type
             ->flatten()
-            // update IncludesCollection with new child relationships for other queries
-            ->each(function($resources) use ($path){
-                foreach($resources->relationships()->listRelationships() as $relationshipType){
-                    $newPath = sprintf("%s.%s", $path, $relationshipType);
+            ->reduce(function($carry, $resources){
+                return $carry->merge($resources);
+            }, new ResourceCollection());
 
-                    $relatedIdentifiers = $resources->relationships()->resourceIdentifiersFor($relationshipType);
+        // roll new resources into the ResourceCollection singleton
+        $this->resources->merge($resources);
 
-                    $this->includes->add($newPath, ...$relatedIdentifiers);
-                }
-            })
-            // roll new resources into the ResourceCollection singleton
-            ->each(function($resources){
-                $this->resources->merge($resources);
-            });
+        // update IncludesCollection with new child relationships for other queries
+        foreach($resources->relationships()->listRelationships() as $relationshipType){
+            $relatedIdentifiers = $resources->relationships()->resourceIdentifiersFor($relationshipType);
+
+            $newPath = sprintf("%s.%s", $path, $relationshipType);
+
+            $this->includes->add($newPath, ...$relatedIdentifiers);
+        }
     }   
 }
