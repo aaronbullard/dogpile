@@ -1,6 +1,6 @@
 <?php
 
-namespace JsonApiRepository;
+namespace Dogpile;
 
 use Tightenco\Collect\Support\Collection as TightenCollection;
 

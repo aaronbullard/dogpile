@@ -1,10 +1,10 @@
 <?php
 
-namespace JsonApiRepository\Tests\Unit;
+namespace Dogpile\Tests\Unit;
 
-use JsonApiRepository\Tests\TestCase;
-use JsonApiRepository\ResourceIdentifier;
-use JsonApiRepository\IncludesCollection;
+use Dogpile\Tests\TestCase;
+use Dogpile\ResourceIdentifier;
+use Dogpile\IncludesCollection;
 
 class IncludesCollectionUnitTest extends TestCase
 {

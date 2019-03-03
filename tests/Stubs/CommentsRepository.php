@@ -1,6 +1,6 @@
 <?php
 
-namespace JsonApiRepository\Tests\Stubs;
+namespace Dogpile\Tests\Stubs;
 
 class CommentsRepository extends BaseRepository
 {

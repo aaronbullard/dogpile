@@ -1,9 +1,9 @@
 <?php
 
-namespace JsonApiRepository\Tests\Unit;
+namespace Dogpile\Tests\Unit;
 
-use JsonApiRepository\Tests\TestCase;
-use JsonApiRepository\RelationshipCollection;
+use Dogpile\Tests\TestCase;
+use Dogpile\RelationshipCollection;
 
 class RelationshipCollectionUnitTest extends TestCase
 {

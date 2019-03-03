@@ -1,13 +1,13 @@
 <?php
 
-namespace JsonApiRepository\Tests\Unit;
+namespace Dogpile\Tests\Unit;
 
-use JsonApiRepository\Tests\TestCase;
-use JsonApiRepository\ResourceManager;
-use JsonApiRepository\ResourceCollection;
-use JsonApiRepository\ResourceIdentifier;
-use JsonApiRepository\Tests\Stubs\Model;
-use JsonApiRepository\ResourceRepositoryNotFoundException;
+use Dogpile\Tests\TestCase;
+use Dogpile\ResourceManager;
+use Dogpile\ResourceCollection;
+use Dogpile\ResourceIdentifier;
+use Dogpile\Tests\Stubs\Model;
+use Dogpile\ResourceRepositoryNotFoundException;
 
 class ResourceManagerTest extends TestCase
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace JsonApiRepository\Tests\Stubs;
+namespace Dogpile\Tests\Stubs;
 
-use JsonApiRepository\ResourceRepository;
-use JsonApiRepository\ResourceCollection;
-use JsonApiRepository\NotFoundException;
+use Dogpile\ResourceRepository;
+use Dogpile\ResourceCollection;
+use Dogpile\NotFoundException;
 
 abstract class BaseRepository implements ResourceRepository
 {

@@ -1,14 +1,14 @@
 <?php
-namespace JsonApiRepository\Tests;
+namespace Dogpile\Tests;
 
 use Mockery;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
-use JsonApiRepository\ResourceManager;
-use JsonApiRepository\ResourceIdentifier;
-use JsonApiRepository\Tests\Stubs\Model;
-use JsonApiRepository\Tests\Stubs\PostsRepository;
-use JsonApiRepository\Tests\Stubs\PeopleRepository;
-use JsonApiRepository\Tests\Stubs\CommentsRepository;
+use Dogpile\ResourceManager;
+use Dogpile\ResourceIdentifier;
+use Dogpile\Tests\Stubs\Model;
+use Dogpile\Tests\Stubs\PostsRepository;
+use Dogpile\Tests\Stubs\PeopleRepository;
+use Dogpile\Tests\Stubs\CommentsRepository;
 
 class TestCase extends PHPUnitTestCase
 {

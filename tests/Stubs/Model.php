@@ -1,10 +1,10 @@
 <?php
 
-namespace JsonApiRepository\Tests\Stubs;
+namespace Dogpile\Tests\Stubs;
 
-use JsonApiRepository\Resource;
-use JsonApiRepository\ResourceObject;
-use JsonApiRepository\RelationshipCollection;
+use Dogpile\Resource;
+use Dogpile\ResourceObject;
+use Dogpile\RelationshipCollection;
 
 class Model implements Resource
 {

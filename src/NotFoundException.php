@@ -1,6 +1,6 @@
 <?php
 
-namespace JsonApiRepository;
+namespace Dogpile;
 
 class NotFoundException extends \RuntimeException
 {
