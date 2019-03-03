@@ -2,7 +2,7 @@
 
 namespace JsonApiRepository;
 
-class ResourceIdentifier implements Resource
+class ResourceIdentifier
 {
     protected $type;
 

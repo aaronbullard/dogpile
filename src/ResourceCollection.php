@@ -60,15 +60,6 @@ class ResourceCollection implements Countable
         return true;
     }
 
-    public function find(string $type, string $id)
-    {
-        if($this->has($type, $id) === false){
-            throw NotFoundException::resource($type, $id);
-        }
-
-        return $this->collection[$type][$id];
-    }
-
     public function relationships(): RelationshipCollection
     {
         $relationships = new RelationshipCollection();
@@ -78,6 +69,15 @@ class ResourceCollection implements Countable
         }
 
         return $relationships;
+    }
+
+    public function find(string $type, string $id)
+    {
+        if($this->has($type, $id) === false){
+            throw NotFoundException::resource($type, $id);
+        }
+
+        return $this->collection[$type][$id];
     }
 
     public function toArray(): array

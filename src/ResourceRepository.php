@@ -18,6 +18,7 @@ interface ResourceRepository
      *
      * @param array $ids
      * @return array
+     * @throws NotFoundException
      */
     public function findHavingIds(array $ids): ResourceCollection;
 }

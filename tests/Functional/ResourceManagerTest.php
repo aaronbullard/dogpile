@@ -12,7 +12,7 @@ use JsonApiRepository\ResourceRepositoryNotFoundException;
 class ResourceManagerTest extends TestCase
 {
     // For reference
-    protected $includes = [
+    protected $possibleIncludes = [
         'author', 
         'comments', 
         'comments.author',
@@ -108,8 +108,6 @@ class ResourceManagerTest extends TestCase
             ]
         ];
 
-        $this->posts->find('1')->relationships()->add('comments', ResourceIdentifier::create('posts', '2'));
-
         yield [
             'title' => "it handles an mixed types in a relationship",
             'includes' => ['comments'],
@@ -145,7 +143,7 @@ class ResourceManagerTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_execption_for_an_undefined_type_when_included()
+    public function it_throws_exception_for_an_undefined_type_when_included()
     {
         // Assert
         $this->expectException(ResourceRepositoryNotFoundException::class);

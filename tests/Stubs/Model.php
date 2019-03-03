@@ -6,7 +6,7 @@ use JsonApiRepository\Resource;
 use JsonApiRepository\ResourceObject;
 use JsonApiRepository\RelationshipCollection;
 
-class Model implements Resource, ResourceObject
+class Model implements Resource
 {
     protected $type;
 

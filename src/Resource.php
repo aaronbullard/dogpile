@@ -17,4 +17,11 @@ interface Resource
      * @return string
      */
     public function id(): string;
+
+    /**
+     * Returns an array of ResourceIdentifiers
+     *
+     * @return RelationshipCollection
+     */
+    public function relationships(): RelationshipCollection;
 }

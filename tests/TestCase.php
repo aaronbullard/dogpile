@@ -9,7 +9,6 @@ use JsonApiRepository\Tests\Stubs\Model;
 use JsonApiRepository\Tests\Stubs\PostsRepository;
 use JsonApiRepository\Tests\Stubs\PeopleRepository;
 use JsonApiRepository\Tests\Stubs\CommentsRepository;
-use JsonApiRepository\Tests\Stubs\UsersRepository;
 
 class TestCase extends PHPUnitTestCase
 {
@@ -40,17 +39,10 @@ class TestCase extends PHPUnitTestCase
             Model::create('comments', '103')
         );
 
-        $this->users = new UsersRepository(
-            Model::create('users', '21'),
-            Model::create('users', '22'),
-            Model::create('users', '23')
-        );
-
         $this->manager = new ResourceManager(
             $this->posts,
             $this->people,
-            $this->comments,
-            $this->users
+            $this->comments
         );
     }
 
@@ -66,6 +58,17 @@ class TestCase extends PHPUnitTestCase
 
         for($i=0; $i < $num; $i++){
             $results[] = ResourceIdentifier::create($type, $i);
+        }
+
+        return $results;
+    }
+
+    protected function createResources($num, $type): array
+    {
+        $results = [];
+
+        for($i=0; $i < $num; $i++){
+            $results[] = Model::create($type, $i);
         }
 
         return $results;

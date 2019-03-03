@@ -3,7 +3,6 @@
 namespace JsonApiRepository\Tests\Unit;
 
 use JsonApiRepository\Tests\TestCase;
-use JsonApiRepository\ResourceIdentifier;
 use JsonApiRepository\RelationshipCollection;
 
 class RelationshipCollectionUnitTest extends TestCase
@@ -23,7 +22,18 @@ class RelationshipCollectionUnitTest extends TestCase
         $this->collection->add('authors', $resIdents[2], $resIdents[3], $resIdents[4]);
         $this->collection->add('authors', $resIdents[4]);
 
-        $this->assertCount(5, $this->collection->resourceIdentifiersFor('authors'));
-        $this->assertEquals([0,1,2,3,4], $this->collection->getIdsFor('authors'));
+        $this->assertCount(5, $this->collection->identifiersFor('authors'));
+    }
+
+    /** @test */
+    public function it_adds_distinct_relationships_with_different_types()
+    {
+        $people = $this->createResourceIdentifiers(5, 'people');
+        $users = $this->createResourceIdentifiers(1, 'users');
+
+        $this->collection->add('authors', ...$people);
+        $this->collection->add('authors', $users[0]);
+
+        $this->assertCount(6, $this->collection->identifiersFor('authors'));
     }
 }

@@ -59,7 +59,7 @@ class QueryHandler
 
         // update IncludesCollection with new child relationships for other queries
         foreach($resources->relationships()->listRelationships() as $relationshipType){
-            $relatedIdentifiers = $resources->relationships()->resourceIdentifiersFor($relationshipType);
+            $relatedIdentifiers = $resources->relationships()->identifiersFor($relationshipType);
 
             $newPath = sprintf("%s.%s", $path, $relationshipType);
 

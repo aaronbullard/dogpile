@@ -34,7 +34,7 @@ class QueryBuilder
         $this->relationships = $relationships;
 
         foreach($relationships->listRelationships() as $path){
-            $this->includes->add($path, ...$relationships->resourceIdentifiersFor($path));
+            $this->includes->add($path, ...$relationships->identifiersFor($path));
         }
 
         return $this;

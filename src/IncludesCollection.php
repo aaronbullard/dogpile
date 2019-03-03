@@ -2,59 +2,18 @@
 
 namespace JsonApiRepository;
 
-class IncludesCollection
+class IncludesCollection extends RelationshipCollection
 {
     const ROOT = "$";
 
-    protected $items = [];
-
-    public function add(string $path, ResourceIdentifier ...$identities): IncludesCollection
+    public function isRoot(string $relationship): bool
     {
-        // initialize includes path
-        if(!$this->has($path)){
-            $this->items[$path] = [];
-        }
-
-        foreach($identities as $i){
-            $key = $i->type() . $i->id();
-            $this->items[$path][$key] = $i;
-        }
-        
-        return $this;
+        return $relationship === static::ROOT;
     }
 
-    public function has(string $path): bool
+    public static function parent(string $relationship): string 
     {
-        return isset($this->items[$path]);
-    }
-
-    public function hasParent(string $path): bool
-    {
-        return static::parent($path) !== static::ROOT;
-    }
-
-    public function isRoot(string $path): bool
-    {
-        return $path === static::ROOT;
-    }
-
-    public function identifiersFor(string $path): Collection
-    {
-        return $this->has($path) 
-            ? new Collection(array_values($this->items[$path]))
-            : new Collection();
-    }
-
-    public function toArray(): array
-    {
-        return array_map(function($identifiers) {
-            return array_values($identifiers);
-        }, $this->items);
-    }
-
-    public static function parent(string $path): string 
-    {
-        $arr = explode('.', $path);
+        $arr = explode('.', $relationship);
 
         if(count($arr) == 1){
             return static::ROOT;
@@ -65,9 +24,9 @@ class IncludesCollection
         return implode('.', $arr);
     }
 
-    public static function last(string $path): string 
+    public static function last(string $relationship): string 
     {
-        $arr = explode('.', $path);
+        $arr = explode('.', $relationship);
 
         return end($arr);
     }

@@ -27,15 +27,6 @@ class IncludesCollectionUnitTest extends TestCase
     }
 
     /** @test */
-    public function it_casts_to_an_array()
-    {
-        $this->collection->add('authors', ResourceIdentifier::create('people', '1'), ResourceIdentifier::create('people', '2'));
-        $this->collection->add('authors', ResourceIdentifier::create('people', '1'));
-
-        $this->assertEquals('people', $this->collection->toArray()['authors'][0]->type());
-    }
-
-    /** @test */
     public function it_finds_the_parent_include()
     {
         $this->assertEquals('$', IncludesCollection::parent('comments'));
