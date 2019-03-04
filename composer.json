@@ -2,8 +2,8 @@
     "name": "aaronbullard/dogpile",
     "type": "library",
     "license": "MIT",
-    "description": "",
-    "keywords": [],
+    "description": "JSON:API helper library to cleanly import included relationships",
+    "keywords": ["jsonapi", "json", "api", "standard"],
     "authors": [
         {
             "name": "Aaron Bullard",
