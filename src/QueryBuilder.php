@@ -16,6 +16,8 @@ class QueryBuilder
 
     protected $paths;
 
+    protected $completedPaths = [];
+
     public function __construct(ResourceManager $manager)
     {
         $this->manager      = $manager;
@@ -90,6 +92,11 @@ class QueryBuilder
             return;
         }
 
+        // Has this path already been queried
+        if(in_array($path, $this->completedPaths)){
+            return;
+        }
+
         // do we have the identifiers 
         if(false === $this->includes->has($path)){
             // (inception...) Let's get resources from our parent e.g. if no ids for comments.author, go query comments
@@ -127,5 +134,8 @@ class QueryBuilder
 
             $this->includes->add($newPath, ...$relatedIdentifiers);
         }
+
+        // Update completed paths for faster operaion
+        $this->completedPaths[] = $path;
     }
 }

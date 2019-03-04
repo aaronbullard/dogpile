@@ -84,6 +84,24 @@ class ResourceManagerTest extends TestCase
         ];
 
         yield [
+            'title' => "it returns included relationships once",
+            'includes' => ['author', 'comments', 'comments', 'comments'],
+            'count' => 4,
+            'collection' => [
+                ['people', '11'],
+                ['comments', '101'],
+                ['comments', '102']
+            ]
+        ];
+
+        yield [
+            'title' => 'it handles no includes',
+            'includes' => [],
+            'count' => 0,
+            'collection' => []
+        ];
+
+        yield [
             'title' => "it returns nested includes",
             'includes' => ['author', 'comments', 'comments.author', 'comments.author.posts'],
             'count' => 7,
@@ -129,15 +147,24 @@ class ResourceManagerTest extends TestCase
             ]
         ];
 
+        // yield [
+        //     'title' => "it handles an undefined type",
+        //     'includes' => ['author', 'comments'],
+        //     'count' => 4,
+        //     'collection' => [
+        //         ['people', '11'],
+        //         ['comments', '101'],
+        //         ['comments', '102'],
+        //         ['posts', '2']
+        //     ]
+        // ];
+
         yield [
-            'title' => "it handles an undefined type",
-            'includes' => ['author', 'comments'],
-            'count' => 4,
+            'title' => 'it handles no includes',
+            'includes' => [],
+            'count' => 0,
             'collection' => [
-                ['people', '11'],
-                ['comments', '101'],
-                ['comments', '102'],
-                ['posts', '2']
+
             ]
         ];
     }
