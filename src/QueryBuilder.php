@@ -15,11 +15,11 @@ class QueryBuilder
     public function __construct(ResourceManager $manager)
     {
         $this->manager      = $manager;
-        $this->includes     = new IncludesCollection();
+        $this->includes     = new RelationshipCollection();
         $this->resources    = new ResourceCollection();
     }
 
-    public function includesCollection(): IncludesCollection
+    public function includesCollection(): RelationshipCollection
     {
         return $this->includess;
     }
@@ -40,8 +40,11 @@ class QueryBuilder
         return $this;
     }
 
-    public function includes(string ...$paths): QueryBuilder
+    public function include(string ...$paths): QueryBuilder
     {
+        // remove duplicates
+        $paths = array_unique($paths);
+
         // Sorting allows parents to go before children e.g. author, author.comments
         sort($paths);
 
@@ -53,8 +56,10 @@ class QueryBuilder
     public function query(): ResourceCollection
     {
         foreach($this->paths as $path){
-            QueryHandler::create($this->manager, $this->includes, $this->resources)->resolve($path);
+            $this->resolve($path);
         }
+
+        // At this point, all resources have been gathered
 
         // get identifiers for just the includes that were requested
         $identifiers = new Collection();
@@ -71,5 +76,50 @@ class QueryBuilder
         }
 
         return $resources;
+    }
+
+    protected function resolve(string $path): void
+    {
+        // If recursion brought us to the root, stop
+        if($this->includes->isRoot($path)){
+            return;
+        }
+
+        // do we have the identifiers 
+        if(!$this->includes->has($path)){
+            // (inception...) Let's get resources from our parent e.g. if no ids for comments.author, go query comments
+            $this->resolve($this->includes->parent($path));
+        }
+
+        $resources = $this->includes->identifiersFor($path)
+            // filter out identifiers for resources we already have
+            ->filter(function($identifier){
+                return false === $this->resources->has($identifier->type(), $identifier->id());
+            })
+            // group identifiers by their type for group querying
+            ->groupBy(function($identifier){ return $identifier->type(); })
+            // map Identifiers to Resources
+            ->map(function($identifiers, $type){
+                return $this->manager->repositoryFor($type)->findHavingIds(
+                    $identifiers->map(function($identifier){ return $identifier->id(); })->toArray()
+                );
+            })
+            // get rid of hash grouping by type
+            ->flatten()
+            ->reduce(function($carry, $resources){
+                return $carry->merge($resources);
+            }, new ResourceCollection());
+
+        // roll new resources into the ResourceCollection singleton
+        $this->resources->merge($resources);
+
+        // update IncludesCollection with new child relationships for other queries
+        foreach($resources->relationships()->listRelationships() as $relationshipType){
+            $relatedIdentifiers = $resources->relationships()->identifiersFor($relationshipType);
+
+            $newPath = sprintf("%s.%s", $path, $relationshipType);
+
+            $this->includes->add($newPath, ...$relatedIdentifiers);
+        }
     }
 }

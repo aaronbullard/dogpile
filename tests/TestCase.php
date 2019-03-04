@@ -18,6 +18,8 @@ class TestCase extends PHPUnitTestCase
 
     protected $comments;
 
+    protected $manager;
+
     protected function setUp()
     {
         parent::setUp();

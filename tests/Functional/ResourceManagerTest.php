@@ -57,7 +57,7 @@ class ResourceManagerTest extends TestCase
         // Execute
         $collection = $this->manager->newQuery()
                 ->setRelationships($this->posts->find('1')->relationships())
-                ->includes(...$test['includes'])
+                ->include(...$test['includes'])
                 ->query();
 
         // Assert
@@ -149,7 +149,7 @@ class ResourceManagerTest extends TestCase
         $this->expectException(ResourceRepositoryNotFoundException::class);
         $collection = $this->manager->newQuery()
                             ->setRelationships($this->posts->find('1')->relationships())
-                            ->includes('author', 'comments', 'link')
+                            ->include('author', 'comments', 'link')
                             ->query();
     }
 }

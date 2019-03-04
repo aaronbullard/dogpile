@@ -65,7 +65,7 @@ class ResourceCollection implements Countable
         $relationships = new RelationshipCollection();
 
         foreach($this->toArray() as $resource){
-            $relationships->merge($resource->relationships());
+            $relationships->mergeRelationships($resource->relationships());
         }
 
         return $relationships;
