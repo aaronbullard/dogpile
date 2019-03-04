@@ -35,11 +35,6 @@ class ResourceCollection implements Countable
         return $this;
     }
 
-    public function listTypes(): array
-    {
-        return array_keys($this->collection);
-    }
-
     public function count(): int
     {
         return array_reduce($this->collection, function($carry, $i){

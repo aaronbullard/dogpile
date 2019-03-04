@@ -21,7 +21,7 @@ class QueryBuilder
 
     public function includesCollection(): RelationshipCollection
     {
-        return $this->includess;
+        return $this->includes;
     }
 
     public function resourceCollection(): ResourceCollection
@@ -60,6 +60,7 @@ class QueryBuilder
         }
 
         // At this point, all resources have been gathered
+        // Let's return only what was requested
 
         // get identifiers for just the includes that were requested
         $identifiers = new Collection();
@@ -67,7 +68,7 @@ class QueryBuilder
             $identifiers = $this->includes->identifiersFor($path)->merge($identifiers);
         }
 
-        // return back a collectoin of resources that were requested
+        // return back a collection of resources that were requested
         $resources = new ResourceCollection();
         foreach($identifiers as $identifier){
             $resources->add(

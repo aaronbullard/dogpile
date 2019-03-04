@@ -60,12 +60,12 @@ class RelationshipCollectionUnitTest extends TestCase
 
         // Execute
         $primary->mergeRelationships($secondary);
-dd($primary);
+
+        $ids = $primary->identifiersFor('comments')
+                ->map(function($id){ return $id->id(); })
+                ->toArray();
+
         // Assert
-        $this->assertTrue(
-            $primary->has('comments', '1') &&
-            $primary->has('comments', '2') &&
-            $primary->has('comments', '3')
-        );
+        $this->assertEquals(['1', '2', '3'], $ids);
     }
 }

@@ -6,8 +6,6 @@ class RelationshipCollection extends Collection
 {
     const ROOT = "$";
 
-    protected $items = [];
-
     public function add(string $relationship, ResourceIdentifier ...$identities): RelationshipCollection
     {
         if(false === $this->has($relationship)){
@@ -41,7 +39,7 @@ class RelationshipCollection extends Collection
     public function identifiersFor(string $relationship): Collection
     {
         return $this->has($relationship) 
-            ? Collection::wrap(array_values($this->items[$relationship]))
+            ? Collection::wrap($this->items[$relationship])->values()
             : Collection::wrap([]);
     }
 
