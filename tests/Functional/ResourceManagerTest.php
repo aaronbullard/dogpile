@@ -7,7 +7,7 @@ use Dogpile\ResourceManager;
 use Dogpile\Tests\Stubs\Model;
 use Dogpile\ResourceIdentifier;
 use Dogpile\Collections\ResourceCollection;
-use Dogpile\Exceptions\ResourceRepositoryNotFoundException;
+use Dogpile\Exceptions\ResourceQueryNotFoundException;
 
 class ResourceManagerTest extends TestCase
 {
@@ -138,33 +138,20 @@ class ResourceManagerTest extends TestCase
         ];
 
         yield [
-            'title' => "it handles an undefined relationship",
+            'title' => 'it handles an undefined relationship',
+            'includes' => ['posts'],
+            'count' => 0,
+            'collection' => []
+        ];
+
+        yield [
+            'title' => "it handles an undefined NESTED relationship",
             'includes' => ['comments', 'comments.zebras.posts'],
             'count' => 3,
             'collection' => [
                 ['comments', '101'],
-                ['comments', '102']
-            ]
-        ];
-
-        // yield [
-        //     'title' => "it handles an undefined type",
-        //     'includes' => ['author', 'comments'],
-        //     'count' => 4,
-        //     'collection' => [
-        //         ['people', '11'],
-        //         ['comments', '101'],
-        //         ['comments', '102'],
-        //         ['posts', '2']
-        //     ]
-        // ];
-
-        yield [
-            'title' => 'it handles no includes',
-            'includes' => [],
-            'count' => 0,
-            'collection' => [
-
+                ['comments', '102'],
+                ['posts', '2']
             ]
         ];
     }
@@ -173,7 +160,7 @@ class ResourceManagerTest extends TestCase
     public function it_throws_exception_for_an_undefined_type_when_included()
     {
         // Assert
-        $this->expectException(ResourceRepositoryNotFoundException::class);
+        $this->expectException(ResourceQueryNotFoundException::class);
         $collection = $this->manager->newQuery()
                             ->setRelationships($this->posts->find('1')->relationships())
                             ->include('author', 'comments', 'link')

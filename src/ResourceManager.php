@@ -2,8 +2,8 @@
 
 namespace Dogpile;
 
-use Dogpile\Contracts\ResourceRepository;
-use Dogpile\Exceptions\ResourceRepositoryNotFoundException;
+use Dogpile\Contracts\ResourceQuery;
+use Dogpile\Exceptions\ResourceQueryNotFoundException;
 
 class ResourceManager
 {
@@ -15,24 +15,24 @@ class ResourceManager
 
     protected $resourceObjects = [];
 
-    public function __construct(ResourceRepository ...$repos)
+    public function __construct(ResourceQuery ...$repos)
     {
         foreach($repos as $repo){
             $this->register($repo);
         }
     }
 
-    public function register(ResourceRepository $repo): ResourceManager
+    public function register(ResourceQuery $repo): ResourceManager
     {
         $this->repos[$repo->resourceType()] = $repo;
 
         return $this;
     }
 
-    public function repositoryFor(string $resourceType): ResourceRepository
+    public function repositoryFor(string $resourceType): ResourceQuery
     {
         if (!isset($this->repos[$resourceType])) {
-            throw ResourceRepositoryNotFoundException::missing($resourceType);
+            throw ResourceQueryNotFoundException::missing($resourceType);
         }
 
         return $this->repos[$resourceType];

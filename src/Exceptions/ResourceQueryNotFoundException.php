@@ -2,9 +2,9 @@
 
 namespace Dogpile\Exceptions;
 
-class ResourceRepositoryNotFoundException extends BaseException
+class ResourceQueryNotFoundException extends BaseException
 {
-    public static function missing(string $resourceType): ResourceRepositoryNotFoundException
+    public static function missing(string $resourceType): ResourceQueryNotFoundException
     {
         $message = sprintf("Could not find a Resource Repository for Resource Objects of type %s", $resourceType);
 

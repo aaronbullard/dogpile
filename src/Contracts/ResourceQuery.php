@@ -4,7 +4,7 @@ namespace Dogpile\Contracts;
 
 use Dogpile\Collections\ResourceCollection;
 
-interface ResourceRepository
+interface ResourceQuery
 {
     /**
      * Returns the type of Resource Objects

@@ -2,11 +2,11 @@
 
 namespace Dogpile\Tests\Stubs;
 
-use Dogpile\Contracts\ResourceRepository;
+use Dogpile\Contracts\ResourceQuery;
 use Dogpile\Collections\ResourceCollection;
 use Dogpile\Exceptions\NotFoundException;
 
-abstract class BaseRepository implements ResourceRepository
+abstract class BaseRepository implements ResourceQuery
 {
     protected $models = [];
 
