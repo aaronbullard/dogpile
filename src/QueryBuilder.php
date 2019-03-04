@@ -87,7 +87,7 @@ class QueryBuilder
         }
 
         // do we have the identifiers 
-        if(!$this->includes->has($path)){
+        if(false === $this->includes->has($path)){
             // (inception...) Let's get resources from our parent e.g. if no ids for comments.author, go query comments
             $this->resolve($this->includes->parent($path));
         }
@@ -105,14 +105,15 @@ class QueryBuilder
                     $identifiers->map(function($identifier){ return $identifier->id(); })->toArray()
                 );
             })
-            // get rid of hash grouping by type
+            // get rid of hash grouping by type, return list of resources
             ->flatten()
-            ->reduce(function($carry, $resources){
-                return $carry->merge($resources);
-            }, new ResourceCollection());
-
-        // roll new resources into the ResourceCollection singleton
-        $this->resources->merge($resources);
+            ->pipe(function($collection){
+                return new ResourceCollection(...$collection);
+            })
+            // roll new resources into the ResourceCollection singleton
+            ->each(function($resource){
+                $this->resources->add($resource);
+            });
 
         // update IncludesCollection with new child relationships for other queries
         foreach($resources->relationships()->listRelationships() as $relationshipType){

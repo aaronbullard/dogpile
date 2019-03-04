@@ -2,12 +2,8 @@
 
 namespace Dogpile;
 
-use Countable;
-
-class ResourceCollection implements Countable
+class ResourceCollection extends Collection
 {
-    protected $collection = [];
-
     public function __construct(Resource ...$resources)
     {
         $this->add(...$resources);
@@ -16,7 +12,7 @@ class ResourceCollection implements Countable
     public function add(Resource ...$resources): ResourceCollection
     {
         foreach($resources as $r){
-            $this->collection[static::getKey($r->type(), $r->id())] = $r;
+            $this->items[static::getKey($r->type(), $r->id())] = $r;
         }
 
         return $this;
@@ -27,23 +23,18 @@ class ResourceCollection implements Countable
         return $type . '-' . $id;
     }
 
-    public function merge(ResourceCollection $collection): ResourceCollection
+    public function exists(string $type, string $id): bool
     {
-        $resources = $collection->toArray();
-
-        $this->add(...$resources);
-
-        return $this;
+        return isset($this->items[static::getKey($type, $id)]);
     }
 
-    public function count(): int
+    public function find(string $type, string $id)
     {
-        return count($this->collection);
-    }
+        if($this->exists($type, $id) === false){
+            throw NotFoundException::resource($type, $id);
+        }
 
-    public function has(string $type, string $id): bool
-    {
-        return isset($this->collection[static::getKey($type, $id)]);
+        return $this->items[static::getKey($type, $id)];
     }
 
     public function relationships(): RelationshipCollection
@@ -55,19 +46,5 @@ class ResourceCollection implements Countable
         }
 
         return $relationships;
-    }
-
-    public function find(string $type, string $id)
-    {
-        if($this->has($type, $id) === false){
-            throw NotFoundException::resource($type, $id);
-        }
-
-        return $this->collection[static::getKey($type, $id)];
-    }
-
-    public function toArray(): array
-    {
-        return array_values($this->collection);
     }
 }

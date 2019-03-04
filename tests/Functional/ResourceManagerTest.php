@@ -66,7 +66,7 @@ class ResourceManagerTest extends TestCase
         $this->assertCount($test['count'], $collection, $test['title']);
 
         foreach($test['collection'] as $item){
-            $this->assertTrue($collection->has(...$item), $test['title']);
+            $this->assertTrue($collection->exists(...$item), $test['title']);
         }
     }
 
