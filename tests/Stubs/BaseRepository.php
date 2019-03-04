@@ -2,9 +2,9 @@
 
 namespace Dogpile\Tests\Stubs;
 
-use Dogpile\ResourceRepository;
-use Dogpile\ResourceCollection;
-use Dogpile\NotFoundException;
+use Dogpile\Contracts\ResourceRepository;
+use Dogpile\Collections\ResourceCollection;
+use Dogpile\Exceptions\NotFoundException;
 
 abstract class BaseRepository implements ResourceRepository
 {

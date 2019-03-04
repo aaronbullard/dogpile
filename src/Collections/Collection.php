@@ -1,6 +1,6 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Collections;
 
 use Tightenco\Collect\Support\Collection as TightenCollection;
 

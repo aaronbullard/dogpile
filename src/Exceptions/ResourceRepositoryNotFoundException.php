@@ -1,8 +1,8 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Exceptions;
 
-class ResourceRepositoryNotFoundException extends \RuntimeException
+class ResourceRepositoryNotFoundException extends BaseException
 {
     public static function missing(string $resourceType): ResourceRepositoryNotFoundException
     {

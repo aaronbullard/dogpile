@@ -1,6 +1,8 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Contracts;
+
+use Dogpile\Collections\ResourceCollection;
 
 interface ResourceRepository
 {

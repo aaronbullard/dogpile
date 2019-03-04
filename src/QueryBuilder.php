@@ -2,6 +2,10 @@
 
 namespace Dogpile;
 
+use Dogpile\Collections\Collection;
+use Dogpile\Collections\ResourceCollection;
+use Dogpile\Collections\RelationshipCollection;
+
 class QueryBuilder
 {
     protected $manager;

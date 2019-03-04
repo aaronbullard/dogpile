@@ -2,9 +2,8 @@
 
 namespace Dogpile\Tests\Stubs;
 
-use Dogpile\Resource;
-use Dogpile\ResourceObject;
-use Dogpile\RelationshipCollection;
+use Dogpile\Contracts\Resource;
+use Dogpile\Collections\RelationshipCollection;
 
 class Model implements Resource
 {

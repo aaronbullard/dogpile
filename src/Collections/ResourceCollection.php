@@ -1,6 +1,8 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Collections;
+
+use Dogpile\Contracts\Resource;
 
 class ResourceCollection extends Collection
 {

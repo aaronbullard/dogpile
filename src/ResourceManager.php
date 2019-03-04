@@ -2,6 +2,9 @@
 
 namespace Dogpile;
 
+use Dogpile\Contracts\ResourceRepository;
+use Dogpile\Exceptions\ResourceRepositoryNotFoundException;
+
 class ResourceManager
 {
     protected $repos = [];

@@ -1,6 +1,8 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Collections;
+
+use Dogpile\ResourceIdentifier;
 
 class RelationshipCollection extends Collection
 {

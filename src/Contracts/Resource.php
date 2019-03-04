@@ -1,6 +1,8 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Contracts;
+
+use Dogpile\Collections\RelationshipCollection;
 
 interface Resource
 {

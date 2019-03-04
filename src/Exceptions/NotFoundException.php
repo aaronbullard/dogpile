@@ -1,8 +1,8 @@
 <?php
 
-namespace Dogpile;
+namespace Dogpile\Exceptions;
 
-class NotFoundException extends \RuntimeException
+class NotFoundException extends BaseException
 {
     public static function resource(string $type, string $id): NotFoundException
     {

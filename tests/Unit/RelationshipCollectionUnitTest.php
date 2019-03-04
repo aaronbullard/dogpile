@@ -3,9 +3,9 @@
 namespace Dogpile\Tests\Unit;
 
 use Dogpile\Tests\TestCase;
-use Dogpile\Collection;
+use Dogpile\Collections\Collection;
 use Dogpile\ResourceIdentifier as Ident;
-use Dogpile\RelationshipCollection;
+use Dogpile\Collections\RelationshipCollection;
 
 class RelationshipCollectionUnitTest extends TestCase
 {

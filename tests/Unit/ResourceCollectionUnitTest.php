@@ -3,7 +3,7 @@
 namespace Dogpile\Tests\Unit;
 
 use Dogpile\Tests\TestCase;
-use Dogpile\ResourceCollection;
+use Dogpile\Collections\ResourceCollection;
 
 class ResourceCollectionUnitTest extends TestCase
 {

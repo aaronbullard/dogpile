@@ -4,10 +4,10 @@ namespace Dogpile\Tests\Unit;
 
 use Dogpile\Tests\TestCase;
 use Dogpile\ResourceManager;
-use Dogpile\ResourceCollection;
-use Dogpile\ResourceIdentifier;
 use Dogpile\Tests\Stubs\Model;
-use Dogpile\ResourceRepositoryNotFoundException;
+use Dogpile\ResourceIdentifier;
+use Dogpile\Collections\ResourceCollection;
+use Dogpile\Exceptions\ResourceRepositoryNotFoundException;
 
 class ResourceManagerTest extends TestCase
 {
