@@ -8,6 +8,7 @@ use Dogpile\Tests\Stubs\Model;
 use Dogpile\ResourceIdentifier;
 use Dogpile\Collections\ResourceCollection;
 use Dogpile\Exceptions\ResourceQueryNotFoundException;
+use Dogpile\Exceptions\NotFoundException;
 
 class ResourceManagerTest extends TestCase
 {
@@ -164,6 +165,28 @@ class ResourceManagerTest extends TestCase
         $collection = $this->manager->newQuery()
                             ->setRelationships($this->posts->find('1')->relationships())
                             ->include('author', 'comments', 'link')
+                            ->query();
+    }
+
+    /** @test */
+    public function it_throws_exception_when_a_resource_is_not_found()
+    {
+        /**
+         * This is for documented intended behavior.  It's up to the developer
+         * to throw an exception from the ResourceQuery object if a resource object
+         * is not found.
+         */
+
+        // Setup
+        // Add a resource identifier that doesn't exist
+        $this->posts->find('1')->relationships()
+            ->add('comments', ResourceIdentifier::create('comments', '1111'));
+
+        // Assert
+        $this->expectException(NotFoundException::class);
+        $collection = $this->manager->newQuery()
+                            ->setRelationships($this->posts->find('1')->relationships())
+                            ->include('comments')
                             ->query();
     }
 }
