@@ -99,6 +99,25 @@ interface ResourceQuery
 
 ### Second
 
+Register your ResourceQuery handlers with your Dogpile\ResourceManager
+
+```php
+<?php
+// some bootstrap file
+
+use Dogpile\ResourceManager;
+
+$conn = $app['database_connection'];
+
+$app[ResouceManager::class] = new ResourceManager(
+    new AuthorsResourceQuery($conn),
+    new CommentsResourceQuery($conn)
+);
+
+```
+
+### Third
+
 Dogpile\Contracts\ResourceQuery::findHavingIds() must return a Dogpile\Collections\ResourceCollection class containing objects that implement the Dogpile\Contracts\Resource interface.
 
 ```php
@@ -133,9 +152,9 @@ interface Resource
 }
 ```
 
-### Third
+### Fourth
 
-As stated in step 2 above, each Resource object must implement the Resource::realtionships() interface which returns a RelationshipCollection class. The Dogpile\Collections\RelationshipCollection class can be implemented as such below.
+As stated in step above, each Resource object must implement the Resource::realtionships() interface which returns a RelationshipCollection class. The Dogpile\Collections\RelationshipCollection class can be implemented as such below.
 
 ```php
 
