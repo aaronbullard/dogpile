@@ -16,14 +16,15 @@ class ResourceCollection implements Countable
     public function add(Resource ...$resources): ResourceCollection
     {
         foreach($resources as $r){
-            if(!isset($this->collection[$r->type()])){
-                $this->collection[$r->type()] = [];
-            }
-
-            $this->collection[$r->type()][$r->id()] = $r;
+            $this->collection[static::getKey($r->type(), $r->id())] = $r;
         }
-        
+
         return $this;
+    }
+
+    protected static function getKey($type, $id): string
+    {
+        return $type . '-' . $id;
     }
 
     public function merge(ResourceCollection $collection): ResourceCollection
@@ -37,22 +38,12 @@ class ResourceCollection implements Countable
 
     public function count(): int
     {
-        return array_reduce($this->collection, function($carry, $i){
-            return count($i) + $carry;
-        }, 0);
+        return count($this->collection);
     }
 
     public function has(string $type, string $id): bool
     {
-        if(!isset($this->collection[$type])){
-            return false;
-        }
-
-        if(!isset($this->collection[$type][$id])){
-            return false;
-        }
-
-        return true;
+        return isset($this->collection[static::getKey($type, $id)]);
     }
 
     public function relationships(): RelationshipCollection
@@ -72,13 +63,11 @@ class ResourceCollection implements Countable
             throw NotFoundException::resource($type, $id);
         }
 
-        return $this->collection[$type][$id];
+        return $this->collection[static::getKey($type, $id)];
     }
 
     public function toArray(): array
     {
-        return array_reduce($this->collection, function($carry, $i){
-            return array_merge($carry, $i);
-        }, []);
+        return array_values($this->collection);
     }
 }
