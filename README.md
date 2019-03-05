@@ -1,5 +1,8 @@
 # Dogpile
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/fd29ace6ed68f526906a/maintainability)](https://codeclimate.com/github/aaronbullard/dogpile/maintainability)
+
+![](./img/dogpile.jpg)
 
 JSON:API helper library to cleanly import included relationships
 
@@ -35,11 +38,11 @@ This library will quickly query and include the related 'author' and 'comments' 
 
 ```php
 
-// Example contoller method for GET /posts/1
+// Example contoller method for GET /posts/1?include=author,comments,comments.author
 public function show(Request $httpRequest): JsonResponse
 {
     $postId = $httpRequest->get('postId');
-    $includes = explode(',', $httpRequest->get('include')); //['author, comments', 'comments.author'];
+    $includes = explode(',', $httpRequest->get('include')); //['author', 'comments', 'comments.author'];
 
     // In this example, $post implements the Dogpile\Contracts\Resource interface;
     $post = $this->myPostRepo->find($postId);

@@ -56,8 +56,9 @@ class ResourceManagerTest extends TestCase
     protected function execute_test(array $test)
     {
         // Execute
-        $collection = $this->manager->newQuery()
-                ->setRelationships($this->posts->find('1')->relationships())
+        $query = $this->manager->newQuery();
+                
+        $collection = $query->setRelationships($this->posts->find('1')->relationships())
                 ->include(...$test['includes'])
                 ->query();
 
@@ -68,6 +69,17 @@ class ResourceManagerTest extends TestCase
 
         foreach($test['collection'] as $item){
             $this->assertTrue($collection->exists(...$item), $test['title']);
+        }
+
+        // Let's see how many Identifiers were mapped
+        if (isset($test['relationships'])){
+            $arr = $test['relationships'];
+            sort($arr);
+            $this->assertEquals(
+                array_values($arr),
+                $query->relationships()->listRelationships()->all(),
+                $test['title']
+            );
         }
     }
 
@@ -81,7 +93,8 @@ class ResourceManagerTest extends TestCase
                 ['people', '11'],
                 ['comments', '101'],
                 ['comments', '102']
-            ]
+            ],
+            'relationships' => ['author', 'comments', 'comments.author', 'link']
         ];
 
         yield [
@@ -92,14 +105,16 @@ class ResourceManagerTest extends TestCase
                 ['people', '11'],
                 ['comments', '101'],
                 ['comments', '102']
-            ]
+            ],
+            'relationships' => ['author', 'comments', 'comments.author', 'link']
         ];
 
         yield [
             'title' => 'it handles no includes',
             'includes' => [],
             'count' => 0,
-            'collection' => []
+            'collection' => [],
+            'relationships' => ['author', 'comments', 'link']
         ];
 
         yield [
@@ -114,7 +129,8 @@ class ResourceManagerTest extends TestCase
                 ['people', '13'],
                 ['posts', '2'],
                 ['posts', '3']
-            ]
+            ],
+            'relationships' => ['author', 'comments', 'comments.author', 'comments.author.posts', 'link']
         ];
 
         yield [
@@ -124,7 +140,8 @@ class ResourceManagerTest extends TestCase
             'collection' => [
                 ['posts', '2'],
                 ['posts', '3']
-            ]
+            ],
+            'relationships' => ['author', 'comments', 'comments.author', 'comments.author.posts', 'link']
         ];
 
         yield [
@@ -135,14 +152,16 @@ class ResourceManagerTest extends TestCase
                 ['comments', '101'],
                 ['comments', '102'],
                 ['posts', '2']
-            ]
+            ],
+            'relationships' => ['author', 'comments', 'comments.author', 'link']
         ];
 
         yield [
             'title' => 'it handles an undefined relationship',
             'includes' => ['posts'],
             'count' => 0,
-            'collection' => []
+            'collection' => [],
+            'relationships' => ['author', 'comments', 'link']
         ];
 
         yield [
@@ -153,7 +172,8 @@ class ResourceManagerTest extends TestCase
                 ['comments', '101'],
                 ['comments', '102'],
                 ['posts', '2']
-            ]
+            ],
+            'relationships' => ['author', 'comments', 'comments.author', 'link']
         ];
     }
 
@@ -188,5 +208,31 @@ class ResourceManagerTest extends TestCase
                             ->setRelationships($this->posts->find('1')->relationships())
                             ->include('comments')
                             ->query();
+    }
+
+    /** @test */
+    public function it_maps_child_identifiers_of_known_and_unqueried_resources()
+    {
+        // Setup
+        $query = $this->manager->newQuery();
+        // preload resource, comment 101 has an author => people-12
+        $query->resources()->add(
+            $this->comments->find('101')
+        );
+
+        // Execute
+        $collection = $query->setRelationships($this->posts->find('1')->relationships())
+                            ->include('comments')
+                            ->query();
+
+        // Assert
+        // Comment 101 has author people-12.  Comment 101 was known and wasn't queried.  This 
+        // test insures even known resources have their identifiers mapped to the correct path
+        $this->assertCount(
+            1,
+            $query->relationships()->identifiersFor('comments.author')->filter(function($ident){
+                return $ident->type() === 'people' && $ident->id() === '12';
+            })
+        );
     }
 }

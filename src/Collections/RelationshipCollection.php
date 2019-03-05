@@ -22,7 +22,7 @@ class RelationshipCollection extends Collection
 
     public function listRelationships(): Collection
     {
-        return $this->keys();
+        return $this->keys()->sort()->values();
     }
 
     public function mergeRelationships(RelationshipCollection $collection): RelationshipCollection

@@ -108,17 +108,26 @@ class QueryBuilder
         }
 
         // We now have our identifiers, go get the resources
-        $resources = $this->queryResources($path);
+        $identifiers = $this->relationships->identifiersFor($path);
+
+        $resources = $this->queryResources($identifiers);
 
         // update ResourceCollection
         $this->resources->add(...array_values($resources->all()));
 
-        // update IncludesCollection with new child relationships for other queries
-        $this->indexRelationships($path, $resources)->each(function($identifiers, $relationshipType){
-            $this->relationships->add($relationshipType, ...$identifiers);
+        // need ALL Resources (not just ones queried) for this path
+        // need to update the relationships collection with the child related identifiers
+        $allResourcesInPath = $identifiers->map(function($ident){
+                return $this->resources->find($ident->type(), $ident->id());
+            })
+            ->pipe(function($resources){ return new ResourceCollection(...$resources); });
+
+        // update RelationshipCollection with new child relationships for other queries
+        $this->indexRelationships($path, $allResourcesInPath->relationships())->each(function($identifiers, $nestedRelationshipType){
+            $this->relationships->add($nestedRelationshipType, ...$identifiers);
         });
 
-        // Update completed paths for faster operaion
+        // Update completed paths for faster operation
         $this->completedPaths[] = $path;
     }
 
@@ -128,12 +137,11 @@ class QueryBuilder
      * @param string $path
      * @return ResourceCollection
      */
-    protected function queryResources(string $path): ResourceCollection
+    protected function queryResources(Collection $identifiers): ResourceCollection
     {
-        return $this->relationships()->identifiersFor($path)
             // filter out identifiers for resources we already have
-            ->filter(function($identifier){
-                return false === $this->resources()->has($identifier->type(), $identifier->id());
+        return $identifiers->filter(function($identifier){
+                return false === $this->resources()->exists($identifier->type(), $identifier->id());
             })
             // group identifiers by their type for group querying
             ->groupBy(function($identifier){ return $identifier->type(); })
@@ -159,13 +167,13 @@ class QueryBuilder
      * @param ResourceCollection $resources
      * @return Collection
      */
-    protected function indexRelationships(string $path, ResourceCollection $resources): Collection
+    protected function indexRelationships(string $path, RelationshipCollection $relationships): Collection
     {
         // update IncludesCollection with new child relationships for other queries
-        return $resources->relationships()->listRelationships()
-            ->mapWithKeys(function($relationshipType) use ($path, $resources){
-                $newPath = sprintf("%s.%s", $path, $relationshipType);
-                return [$newPath => $resources->relationships()->identifiersFor($relationshipType)]; 
+        return $relationships->listRelationships()
+            ->mapWithKeys(function($relationshipType) use ($path, $relationships){
+                $nestedPath = sprintf("%s.%s", $path, $relationshipType);
+                return [$nestedPath => $relationships->identifiersFor($relationshipType)]; 
             });
     }
 
