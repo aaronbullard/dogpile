@@ -12,7 +12,7 @@ class QueryBuilder
 
     protected $manager;
 
-    protected $includes;
+    protected $relationships;
 
     protected $resources;
 
@@ -22,28 +22,31 @@ class QueryBuilder
 
     public function __construct(ResourceManager $manager)
     {
-        $this->manager      = $manager;
-        $this->includes     = new RelationshipCollection();
-        $this->resources    = new ResourceCollection();
+        $this->manager          = $manager;
+        $this->relationships    = new RelationshipCollection();
+        $this->resources        = new ResourceCollection();
     }
 
-    public function includesCollection(): RelationshipCollection
+    public function relationships(): RelationshipCollection
     {
-        return $this->includes;
+        return $this->relationships;
     }
 
-    public function resourceCollection(): ResourceCollection
+    public function resources(): ResourceCollection
     {
         return $this->resources;
     }
 
+    public function includes(): Collection
+    {
+        return $this->paths;
+    }
+
     public function setRelationships(RelationshipCollection $relationships): QueryBuilder
     {
-        $this->relationships = $relationships;
-
-        foreach($relationships->listRelationships() as $path){
-            $this->includes->add($path, ...$relationships->identifiersFor($path));
-        }
+        $relationships->listRelationships()->each(function($relationshipType) use ($relationships){
+            $this->relationships->add($relationshipType, ...$relationships->identifiersFor($relationshipType));
+        });
 
         return $this;
     }
@@ -56,24 +59,24 @@ class QueryBuilder
         // Sorting allows parents to go before children e.g. author, author.comments
         sort($paths);
 
-        $this->paths = $paths;
+        $this->paths = Collection::wrap($paths);
 
         return $this;
     }
 
     public function query(): ResourceCollection
     {
-        foreach($this->paths as $path){
+        $this->includes()->each(function($path){
             $this->resolve($path);
-        }
+        });
 
         // At this point, all resources have been gathered
         // Let's return only what was requested
 
         // get identifiers for just the includes that were requested
-        return Collection::wrap($this->paths)
+        return $this->includes()
             ->map(function($path){
-                return $this->includes->identifiersFor($path);
+                return $this->relationships->identifiersFor($path);
             })
             ->flatten()
             // Map resource identifier to resource object
@@ -99,7 +102,7 @@ class QueryBuilder
         }
 
         // do we have the identifiers 
-        if(false === $this->includes->has($path)){
+        if(false === $this->relationships->has($path)){
             // (inception...) Let's get resources from our parent e.g. if no ids for comments.author, go query comments
             $this->resolve(static::parent($path));
         }
@@ -112,19 +115,25 @@ class QueryBuilder
 
         // update IncludesCollection with new child relationships for other queries
         $this->indexRelationships($path, $resources)->each(function($identifiers, $relationshipType){
-            $this->includes->add($relationshipType, ...$identifiers);
+            $this->relationships->add($relationshipType, ...$identifiers);
         });
 
         // Update completed paths for faster operaion
         $this->completedPaths[] = $path;
     }
 
+    /**
+     * Query and return all resources which we don't already have in $this->resources
+     *
+     * @param string $path
+     * @return ResourceCollection
+     */
     protected function queryResources(string $path): ResourceCollection
     {
-        return $this->includes->identifiersFor($path)
+        return $this->relationships()->identifiersFor($path)
             // filter out identifiers for resources we already have
             ->filter(function($identifier){
-                return false === $this->resources->has($identifier->type(), $identifier->id());
+                return false === $this->resources()->has($identifier->type(), $identifier->id());
             })
             // group identifiers by their type for group querying
             ->groupBy(function($identifier){ return $identifier->type(); })
@@ -141,6 +150,15 @@ class QueryBuilder
             });
     }
 
+    /**
+     * Prepend the current relationship path to the child relationships
+     * 
+     * e.g. comments => post.comments
+     *
+     * @param string $path
+     * @param ResourceCollection $resources
+     * @return Collection
+     */
     protected function indexRelationships(string $path, ResourceCollection $resources): Collection
     {
         // update IncludesCollection with new child relationships for other queries
@@ -156,6 +174,14 @@ class QueryBuilder
         return $relationship === static::ROOT;
     }
 
+    /**
+     * Get the parent relationship type
+     * 
+     * e.g. author.comments => author
+     *
+     * @param string $relationship
+     * @return string
+     */
     public static function parent(string $relationship): string 
     {
         $arr = explode('.', $relationship);
