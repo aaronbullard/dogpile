@@ -32,6 +32,10 @@ class ResourceManagerTest extends TestCase
             ->add('comments', ResourceIdentifier::create('posts', '2')) // different type
             ->add('link', ResourceIdentifier::create('href', '42')); // undefined type
 
+        // Give author of post the inverse relationship
+        $this->people->find('11')->relationships()
+            ->add('posts', ResourceIdentifier::create('posts', '1'));
+
         // Give comments authors
         $this->comments->find('101')->relationships()
             ->add('author', ResourceIdentifier::create('people', '12'));
@@ -70,17 +74,6 @@ class ResourceManagerTest extends TestCase
         foreach($test['collection'] as $item){
             $this->assertTrue($collection->exists(...$item), $test['title']);
         }
-
-        // Let's see how many Identifiers were mapped
-        if (isset($test['relationships'])){
-            $arr = $test['relationships'];
-            sort($arr);
-            $this->assertEquals(
-                array_values($arr),
-                $query->relationships()->listRelationships()->all(),
-                $test['title']
-            );
-        }
     }
 
     protected function dataProvider()
@@ -93,8 +86,7 @@ class ResourceManagerTest extends TestCase
                 ['people', '11'],
                 ['comments', '101'],
                 ['comments', '102']
-            ],
-            'relationships' => ['author', 'comments', 'comments.author', 'link']
+            ]
         ];
 
         yield [
@@ -105,16 +97,14 @@ class ResourceManagerTest extends TestCase
                 ['people', '11'],
                 ['comments', '101'],
                 ['comments', '102']
-            ],
-            'relationships' => ['author', 'comments', 'comments.author', 'link']
+            ]
         ];
 
         yield [
             'title' => 'it handles no includes',
             'includes' => [],
             'count' => 0,
-            'collection' => [],
-            'relationships' => ['author', 'comments', 'link']
+            'collection' => []
         ];
 
         yield [
@@ -129,19 +119,21 @@ class ResourceManagerTest extends TestCase
                 ['people', '13'],
                 ['posts', '2'],
                 ['posts', '3']
-            ],
-            'relationships' => ['author', 'comments', 'comments.author', 'comments.author.posts', 'link']
+            ]
         ];
 
         yield [
-            'title' => "it returns nested includes by themselves",
+            'title' => "it returns nested includes by ALONG with linking parents",
             'includes' => ['comments.author.posts'],
-            'count' => 2,
+            'count' => 6,
             'collection' => [
+                ['comments', '101'],
+                ['comments', '102'],
+                ['people', '12'],
+                ['people', '13'],
                 ['posts', '2'],
                 ['posts', '3']
-            ],
-            'relationships' => ['author', 'comments', 'comments.author', 'comments.author.posts', 'link']
+            ]
         ];
 
         yield [
@@ -152,16 +144,14 @@ class ResourceManagerTest extends TestCase
                 ['comments', '101'],
                 ['comments', '102'],
                 ['posts', '2']
-            ],
-            'relationships' => ['author', 'comments', 'comments.author', 'link']
+            ]
         ];
 
         yield [
             'title' => 'it handles an undefined relationship',
             'includes' => ['posts'],
             'count' => 0,
-            'collection' => [],
-            'relationships' => ['author', 'comments', 'link']
+            'collection' => []
         ];
 
         yield [
@@ -172,8 +162,17 @@ class ResourceManagerTest extends TestCase
                 ['comments', '101'],
                 ['comments', '102'],
                 ['posts', '2']
-            ],
-            'relationships' => ['author', 'comments', 'comments.author', 'link']
+            ]
+        ];
+
+        yield [
+            'title' => "it handles a recursive relationship",
+            'includes' => ['author.posts.author.posts.author.posts.author'],
+            'count' => 2,
+            'collection' => [
+                ['people', '11'],
+                ['posts', '1']
+            ]
         ];
     }
 

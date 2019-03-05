@@ -71,10 +71,12 @@ class QueryBuilder
         });
 
         // At this point, all resources have been gathered
-        // Let's return only what was requested
+        // Let's return only what was requested PLUS the required
+        // intermediate resources to provide full linkage as per
+        // https://jsonapi.org/format/#fetching-includes
 
-        // get identifiers for just the includes that were requested
-        return $this->includes()
+        // get identifiers for all necessary paths
+        return Collection::wrap($this->completedPaths)
             ->map(function($path){
                 return $this->relationships->identifiersFor($path);
             })
