@@ -187,7 +187,7 @@ use Dogpile\ResourceIdentifier;
 use Dogpile\Contracts\Resource;
 use Dogpile\Collections\RelationshipCollection;
 
-class SomeObjectModel extends Resource
+class SomeObjectModel implements Resource
 {
     protected $jsonapiData = [];
 
