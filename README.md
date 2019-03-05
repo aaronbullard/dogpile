@@ -1,5 +1,8 @@
 # Dogpile
+
 [![Maintainability](https://api.codeclimate.com/v1/badges/fd29ace6ed68f526906a/maintainability)](https://codeclimate.com/github/aaronbullard/dogpile/maintainability)
+
+![](./img/dogpile.jpg)
 
 JSON:API helper library to cleanly import included relationships
 
