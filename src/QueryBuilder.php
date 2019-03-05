@@ -8,6 +8,8 @@ use Dogpile\Collections\RelationshipCollection;
 
 class QueryBuilder
 {
+    const ROOT = "$";
+
     protected $manager;
 
     protected $includes;
@@ -69,26 +71,25 @@ class QueryBuilder
         // Let's return only what was requested
 
         // get identifiers for just the includes that were requested
-        $identifiers = new Collection();
-        foreach($this->paths as $path){
-            $identifiers = $this->includes->identifiersFor($path)->merge($identifiers);
-        }
-
-        // return back a collection of resources that were requested
-        $resources = new ResourceCollection();
-        foreach($identifiers as $identifier){
-            $resources->add(
-                $this->resources->find($identifier->type(), $identifier->id())
-            );
-        }
-
-        return $resources;
+        return Collection::wrap($this->paths)
+            ->map(function($path){
+                return $this->includes->identifiersFor($path);
+            })
+            ->flatten()
+            // Map resource identifier to resource object
+            ->map(function($identifier){
+                return $this->resources->find($identifier->type(), $identifier->id());
+            })
+            // return back a collection of resources that were requested
+            ->pipe(function($resources){
+                return new ResourceCollection(...$resources);
+            });
     }
 
     protected function resolve(string $path): void
     {
         // If recursion brought us to the root, stop
-        if($this->includes->isRoot($path)){
+        if(static::isRoot($path)){
             return;
         }
 
@@ -100,10 +101,27 @@ class QueryBuilder
         // do we have the identifiers 
         if(false === $this->includes->has($path)){
             // (inception...) Let's get resources from our parent e.g. if no ids for comments.author, go query comments
-            $this->resolve($this->includes->parent($path));
+            $this->resolve(static::parent($path));
         }
 
-        $resources = $this->includes->identifiersFor($path)
+        // We now have our identifiers, go get the resources
+        $resources = $this->queryResources($path);
+
+        // update ResourceCollection
+        $this->resources->add(...array_values($resources->all()));
+
+        // update IncludesCollection with new child relationships for other queries
+        $this->indexRelationships($path, $resources)->each(function($identifiers, $relationshipType){
+            $this->includes->add($relationshipType, ...$identifiers);
+        });
+
+        // Update completed paths for faster operaion
+        $this->completedPaths[] = $path;
+    }
+
+    protected function queryResources(string $path): ResourceCollection
+    {
+        return $this->includes->identifiersFor($path)
             // filter out identifiers for resources we already have
             ->filter(function($identifier){
                 return false === $this->resources->has($identifier->type(), $identifier->id());
@@ -120,22 +138,34 @@ class QueryBuilder
             ->flatten()
             ->pipe(function($collection){
                 return new ResourceCollection(...$collection);
-            })
-            // roll new resources into the ResourceCollection singleton
-            ->each(function($resource){
-                $this->resources->add($resource);
             });
+    }
 
+    protected function indexRelationships(string $path, ResourceCollection $resources): Collection
+    {
         // update IncludesCollection with new child relationships for other queries
-        foreach($resources->relationships()->listRelationships() as $relationshipType){
-            $relatedIdentifiers = $resources->relationships()->identifiersFor($relationshipType);
+        return $resources->relationships()->listRelationships()
+            ->mapWithKeys(function($relationshipType) use ($path, $resources){
+                $newPath = sprintf("%s.%s", $path, $relationshipType);
+                return [$newPath => $resources->relationships()->identifiersFor($relationshipType)]; 
+            });
+    }
 
-            $newPath = sprintf("%s.%s", $path, $relationshipType);
+    public function isRoot(string $relationship): bool
+    {
+        return $relationship === static::ROOT;
+    }
 
-            $this->includes->add($newPath, ...$relatedIdentifiers);
+    public static function parent(string $relationship): string 
+    {
+        $arr = explode('.', $relationship);
+
+        if(count($arr) == 1){
+            return static::ROOT;
         }
 
-        // Update completed paths for faster operaion
-        $this->completedPaths[] = $path;
+        unset($arr[count($arr) - 1]);
+
+        return implode('.', $arr);
     }
 }

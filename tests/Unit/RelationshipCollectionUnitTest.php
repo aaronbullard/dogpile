@@ -41,14 +41,6 @@ class RelationshipCollectionUnitTest extends TestCase
     }
 
     /** @test */
-    public function it_finds_the_parent_include()
-    {
-        $this->assertEquals('$', RelationshipCollection::parent('comments'));
-        $this->assertEquals('comments', RelationshipCollection::parent('comments.author'));
-        $this->assertEquals('comments.author', RelationshipCollection::parent('comments.author.posts'));
-    }
-
-    /** @test */
     public function it_merges_nested_arrays()
     {
         // Setup

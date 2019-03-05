@@ -161,8 +161,8 @@ As stated in step above, each Resource object must implement the Resource::realt
 <?php
 
 // Example data
-$jsaonpiData = [
-    'type' => 'post',
+$jsonapiData = [
+    'type' => 'posts',
     'id' => '42',
     'attributes' => [
         'title' => 'Bridge of Death',
