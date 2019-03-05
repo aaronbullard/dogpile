@@ -12,9 +12,16 @@ abstract class BaseRepository implements ResourceQuery
 
     public function __construct(Model ...$models)
     {
+        $this->add(...$models);
+    }
+
+    public function add(Model ...$models): ResourceQuery
+    {
         foreach($models as $model){
             $this->models[$model->id()] = $model;
         }
+
+        return $this;
     }
 
     /**
