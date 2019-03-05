@@ -6,8 +6,6 @@ use Dogpile\ResourceIdentifier;
 
 class RelationshipCollection extends Collection
 {
-    const ROOT = "$";
-
     public function add(string $relationship, ResourceIdentifier ...$identities): RelationshipCollection
     {
         if(false === $this->has($relationship)){
@@ -43,23 +41,5 @@ class RelationshipCollection extends Collection
         return $this->has($relationship) 
             ? Collection::wrap($this->items[$relationship])->values()
             : Collection::wrap([]);
-    }
-
-    public function isRoot(string $relationship): bool
-    {
-        return $relationship === static::ROOT;
-    }
-
-    public static function parent(string $relationship): string 
-    {
-        $arr = explode('.', $relationship);
-
-        if(count($arr) == 1){
-            return static::ROOT;
-        }
-
-        unset($arr[count($arr) - 1]);
-
-        return implode('.', $arr);
     }
 }

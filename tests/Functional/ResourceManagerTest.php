@@ -32,16 +32,16 @@ class ResourceManagerTest extends TestCase
             ->add('comments', ResourceIdentifier::create('posts', '2')) // different type
             ->add('link', ResourceIdentifier::create('href', '42')); // undefined type
 
+        // Give comments authors
         $this->comments->find('101')->relationships()
             ->add('author', ResourceIdentifier::create('people', '12'));
 
         $this->comments->find('102')->relationships()
             ->add('author', ResourceIdentifier::create('people', '13'));
 
+        // Give person 12 two posts they authored
         $this->people->find('12')->relationships()
-            ->add('posts', ResourceIdentifier::create('posts', '2'));
-
-        $this->people->find('12')->relationships()
+            ->add('posts', ResourceIdentifier::create('posts', '2'))
             ->add('posts', ResourceIdentifier::create('posts', '3'));
     }
 
@@ -128,7 +128,7 @@ class ResourceManagerTest extends TestCase
         ];
 
         yield [
-            'title' => "it handles an mixed types in a relationship",
+            'title' => "it handles mixed types in a relationship",
             'includes' => ['comments'],
             'count' => 3,
             'collection' => [
