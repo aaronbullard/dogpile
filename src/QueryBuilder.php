@@ -44,9 +44,7 @@ class QueryBuilder
 
     public function setRelationships(RelationshipCollection $relationships): QueryBuilder
     {
-        $relationships->listRelationships()->each(function($relationshipType) use ($relationships){
-            $this->relationships->add($relationshipType, ...$relationships->identifiersFor($relationshipType));
-        });
+        $this->relationships->mergeRelationships($relationships);
 
         return $this;
     }

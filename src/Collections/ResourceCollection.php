@@ -27,7 +27,7 @@ class ResourceCollection extends Collection
 
     public function exists(string $type, string $id): bool
     {
-        return isset($this->items[static::getKey($type, $id)]);
+        return $this->has(static::getKey($type, $id));
     }
 
     public function find(string $type, string $id)
@@ -41,12 +41,12 @@ class ResourceCollection extends Collection
 
     public function relationships(): RelationshipCollection
     {
-        $relationships = new RelationshipCollection();
+        $allRelationships = new RelationshipCollection();
 
         foreach($this->toArray() as $resource){
-            $relationships->mergeRelationships($resource->relationships());
+            $allRelationships->mergeRelationships($resource->relationships());
         }
 
-        return $relationships;
+        return $allRelationships;
     }
 }
