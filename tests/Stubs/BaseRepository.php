@@ -57,6 +57,6 @@ abstract class BaseRepository implements ResourceQuery
             return $this->find($id);
         }, $ids);
 
-        return new ResourceCollection(...$models);
+        return new ResourceCollection($models);
     }
 }

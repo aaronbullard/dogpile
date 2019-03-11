@@ -6,7 +6,7 @@ use Dogpile\Contracts\Resource;
 
 class ResourceCollection extends Collection
 {
-    public function __construct(Resource ...$resources)
+    public function __construct(array $resources = [])
     {
         $this->add(...$resources);
     }
