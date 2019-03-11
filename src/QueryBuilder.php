@@ -44,9 +44,7 @@ class QueryBuilder
 
     public function setRelationships(RelationshipCollection $relationships): QueryBuilder
     {
-        $relationships->listRelationships()->each(function($relationshipType) use ($relationships){
-            $this->relationships->add($relationshipType, ...$relationships->identifiersFor($relationshipType));
-        });
+        $this->relationships->mergeRelationships($relationships);
 
         return $this;
     }
@@ -87,7 +85,7 @@ class QueryBuilder
             })
             // return back a collection of resources that were requested
             ->pipe(function($resources){
-                return new ResourceCollection(...$resources);
+                return new ResourceCollection($resources->toArray());
             });
     }
 
@@ -122,7 +120,7 @@ class QueryBuilder
         $allResourcesInPath = $identifiers->map(function($ident){
                 return $this->resources->find($ident->type(), $ident->id());
             })
-            ->pipe(function($resources){ return new ResourceCollection(...$resources); });
+            ->pipe(function($resources){ return new ResourceCollection($resources->toArray()); });
 
         // update RelationshipCollection with new child relationships for other queries
         $this->indexRelationships($path, $allResourcesInPath->relationships())->each(function($identifiers, $nestedRelationshipType){
@@ -156,7 +154,7 @@ class QueryBuilder
             // get rid of hash grouping by type, return list of resources
             ->flatten()
             ->pipe(function($collection){
-                return new ResourceCollection(...$collection);
+                return new ResourceCollection($collection->toArray());
             });
     }
 
