@@ -41,12 +41,8 @@ class ResourceCollection extends Collection
 
     public function relationships(): RelationshipCollection
     {
-        $allRelationships = new RelationshipCollection();
-
-        foreach($this->toArray() as $resource){
-            $allRelationships->mergeRelationships($resource->relationships());
-        }
-
-        return $allRelationships;
+        return $this->reduce(function($carry, $resource){
+            return $carry->mergeRelationships($resource->relationships());
+        }, new RelationshipCollection());
     }
 }
