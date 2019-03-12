@@ -1,2 +1,5 @@
 /vendor
 /coverage
+.DS_Store
+composer.lock
+tests/summary.txt
