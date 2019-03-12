@@ -89,7 +89,7 @@ class QueryBuilder
             });
     }
 
-    protected function resolve(string $path): void
+    protected function resolve(string $path)
     {
         // If recursion brought us to the root, stop
         if(static::isRoot($path)){
