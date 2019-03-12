@@ -9,7 +9,7 @@ interface ResourceQuery
     /**
      * Returns the type of Resource Objects
      *
-     * @return void
+     * @return string
      */
     public function resourceType(): string;
 
