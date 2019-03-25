@@ -9,7 +9,6 @@ JSON:API helper library to cleanly import included relationships
 ## Installation
 
 ### Library
-
 ```bash
 git clone git@github.com:aaronbullard/dogpile.git
 ```
