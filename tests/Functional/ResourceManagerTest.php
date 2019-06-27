@@ -76,6 +76,16 @@ class ResourceManagerTest extends TestCase
         }
     }
 
+    /** @test */
+    public function it_lists_registered_resources()
+    {
+        $resourceTypes = $this->manager->listResourceTypes();
+
+        foreach(['posts', 'comments', 'people'] as $resourceType){
+            $this->assertTrue(in_array($resourceType, $resourceTypes));
+        }
+    }
+
     protected function dataProvider()
     {
         yield [

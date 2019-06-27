@@ -38,6 +38,11 @@ class ResourceManager
         return $this->repos[$resourceType];
     }
 
+    public function listResourceTypes(): Array
+    {
+        return array_keys($this->repos);
+    }
+
     public function newQuery(): QueryBuilder
     {
         return new QueryBuilder($this);
