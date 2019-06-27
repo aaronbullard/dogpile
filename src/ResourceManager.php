@@ -43,7 +43,7 @@ class ResourceManager
         return array_keys($this->repos);
     }
 
-    public function hasResourceType($resourceType): Bool
+    public function hasResourceType($resourceType): bool
     {
         return isset($this->repos[$resourceType]);
     }
