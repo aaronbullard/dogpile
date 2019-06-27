@@ -25,6 +25,7 @@ class QueryBuilder
         $this->manager          = $manager;
         $this->relationships    = new RelationshipCollection();
         $this->resources        = new ResourceCollection();
+        $this->paths            = new Collection();
     }
 
     public function relationships(): RelationshipCollection
@@ -52,13 +53,9 @@ class QueryBuilder
     public function include(string ...$paths): QueryBuilder
     {
         // remove duplicates
-        $paths = array_unique($paths);
-
         // Sorting allows parents to go before children e.g. author, author.comments
-        sort($paths);
-
-        $this->paths = Collection::wrap($paths);
-
+        $this->paths = $this->paths->merge($paths)->unique()->sort()->values();
+        
         return $this;
     }
 
