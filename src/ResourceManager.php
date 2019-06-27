@@ -43,6 +43,11 @@ class ResourceManager
         return array_keys($this->repos);
     }
 
+    public function hasResourceType($resourceType): Bool
+    {
+        return isset($this->repos[$resourceType]);
+    }
+
     public function newQuery(): QueryBuilder
     {
         return new QueryBuilder($this);

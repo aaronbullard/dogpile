@@ -86,6 +86,13 @@ class ResourceManagerTest extends TestCase
         }
     }
 
+    /** @test */
+    public function it_checks_for_a_registered_resource_type()
+    {
+        $this->assertTrue($this->manager->hasResourceType('posts'));
+        $this->assertFalse($this->manager->hasResourceType('monkeys'));
+    }
+
     protected function dataProvider()
     {
         yield [
