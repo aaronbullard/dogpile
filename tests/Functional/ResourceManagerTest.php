@@ -76,23 +76,6 @@ class ResourceManagerTest extends TestCase
         }
     }
 
-    /** @test */
-    public function it_lists_registered_resources()
-    {
-        $resourceTypes = $this->manager->listResourceTypes();
-
-        foreach(['posts', 'comments', 'people'] as $resourceType){
-            $this->assertTrue(in_array($resourceType, $resourceTypes));
-        }
-    }
-
-    /** @test */
-    public function it_checks_for_a_registered_resource_type()
-    {
-        $this->assertTrue($this->manager->hasResourceType('posts'));
-        $this->assertFalse($this->manager->hasResourceType('monkeys'));
-    }
-
     protected function dataProvider()
     {
         yield [
@@ -140,7 +123,7 @@ class ResourceManagerTest extends TestCase
         ];
 
         yield [
-            'title' => "it returns nested includes by ALONG with linking parents",
+            'title' => "it returns nested includes AND their parents",
             'includes' => ['comments.author.posts'],
             'count' => 6,
             'collection' => [
@@ -172,8 +155,8 @@ class ResourceManagerTest extends TestCase
         ];
 
         yield [
-            'title' => "it handles an undefined NESTED relationship",
-            'includes' => ['comments', 'comments.zebras.posts'],
+            'title' => "it ignores an undefined NESTED relationship",
+            'includes' => ['comments', 'comments.zebras.author'],
             'count' => 3,
             'collection' => [
                 ['comments', '101'],
@@ -191,6 +174,23 @@ class ResourceManagerTest extends TestCase
                 ['posts', '1']
             ]
         ];
+    }
+
+    /** @test */
+    public function it_lists_registered_resources()
+    {
+        $resourceTypes = $this->manager->listResourceTypes();
+
+        foreach(['posts', 'comments', 'people'] as $resourceType){
+            $this->assertTrue(in_array($resourceType, $resourceTypes));
+        }
+    }
+
+    /** @test */
+    public function it_checks_for_a_registered_resource_type()
+    {
+        $this->assertTrue($this->manager->hasResourceType('posts'));
+        $this->assertFalse($this->manager->hasResourceType('monkeys'));
     }
 
     /** @test */
