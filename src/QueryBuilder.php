@@ -110,7 +110,7 @@ class QueryBuilder
         $resources = $this->queryResources($identifiers);
 
         // update ResourceCollection
-        $this->resources->add(...array_values($resources->all()));
+        $this->resources->addResources(...array_values($resources->all()));
 
         // need ALL Resources (not just ones queried) for this path
         // need to update the relationships collection with the child related identifiers
@@ -121,7 +121,7 @@ class QueryBuilder
 
         // update RelationshipCollection with new child relationships for other queries
         $this->indexRelationships($path, $allResourcesInPath->relationships())->each(function($identifiers, $nestedRelationshipType){
-            $this->relationships->add($nestedRelationshipType, ...$identifiers);
+            $this->relationships->addRelationships($nestedRelationshipType, ...$identifiers);
         });
 
         // Update completed paths for faster operation

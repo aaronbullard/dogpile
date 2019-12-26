@@ -6,7 +6,7 @@ use Dogpile\ResourceIdentifier;
 
 class RelationshipCollection extends Collection
 {
-    public function add(string $relationship, ResourceIdentifier ...$identities): RelationshipCollection
+    public function addRelationships(string $relationship, ResourceIdentifier ...$identities): RelationshipCollection
     {
         if(false === $this->has($relationship)){
             $this->items[$relationship] = [];
@@ -28,11 +28,14 @@ class RelationshipCollection extends Collection
     public function mergeRelationships(RelationshipCollection $collection): RelationshipCollection
     {
         $relTypes = $collection->listRelationships();
-
+try{
         foreach($relTypes as $type){
-            $this->add($type, ...$collection->identifiersFor($type));
+            $this->addRelationships($type, ...$collection->identifiersFor($type));
         }
-
+}
+catch(\Throwable $e){
+    dd($relTypes);
+}
         return $this;
     }
 

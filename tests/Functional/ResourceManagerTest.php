@@ -1,6 +1,6 @@
 <?php
 
-namespace Dogpile\Tests\Unit;
+namespace Dogpile\Tests\Functional;
 
 use Dogpile\Tests\TestCase;
 use Dogpile\ResourceManager;
@@ -26,27 +26,27 @@ class ResourceManagerTest extends TestCase
         parent::setUp();
 
         $this->posts->find('1')->relationships()
-            ->add('author', ResourceIdentifier::create('people', '11'))
-            ->add('comments', ResourceIdentifier::create('comments', '101'))
-            ->add('comments', ResourceIdentifier::create('comments', '102'))
-            ->add('comments', ResourceIdentifier::create('posts', '2')) // different type
-            ->add('link', ResourceIdentifier::create('href', '42')); // undefined type
+            ->addRelationships('author', ResourceIdentifier::create('people', '11'))
+            ->addRelationships('comments', ResourceIdentifier::create('comments', '101'))
+            ->addRelationships('comments', ResourceIdentifier::create('comments', '102'))
+            ->addRelationships('comments', ResourceIdentifier::create('posts', '2')) // different type
+            ->addRelationships('link', ResourceIdentifier::create('href', '42')); // undefined type
 
         // Give author of post the inverse relationship
         $this->people->find('11')->relationships()
-            ->add('posts', ResourceIdentifier::create('posts', '1'));
+            ->addRelationships('posts', ResourceIdentifier::create('posts', '1'));
 
         // Give comments authors
         $this->comments->find('101')->relationships()
-            ->add('author', ResourceIdentifier::create('people', '12'));
+            ->addRelationships('author', ResourceIdentifier::create('people', '12'));
 
         $this->comments->find('102')->relationships()
-            ->add('author', ResourceIdentifier::create('people', '13'));
+            ->addRelationships('author', ResourceIdentifier::create('people', '13'));
 
         // Give person 12 two posts they authored
         $this->people->find('12')->relationships()
-            ->add('posts', ResourceIdentifier::create('posts', '2'))
-            ->add('posts', ResourceIdentifier::create('posts', '3'));
+            ->addRelationships('posts', ResourceIdentifier::create('posts', '2'))
+            ->addRelationships('posts', ResourceIdentifier::create('posts', '3'));
     }
 
     /** @test */
@@ -61,7 +61,7 @@ class ResourceManagerTest extends TestCase
     {
         // Execute
         $query = $this->manager->newQuery();
-                
+           
         $collection = $query->setRelationships($this->posts->find('1')->relationships())
                 ->include(...$test['includes'])
                 ->query();
@@ -216,7 +216,7 @@ class ResourceManagerTest extends TestCase
         // Setup
         // Add a resource identifier that doesn't exist
         $this->posts->find('1')->relationships()
-            ->add('comments', ResourceIdentifier::create('comments', '1111'));
+            ->addRelationships('comments', ResourceIdentifier::create('comments', '1111'));
 
         // Assert
         $this->expectException(NotFoundException::class);
@@ -231,8 +231,9 @@ class ResourceManagerTest extends TestCase
     {
         // Setup
         $query = $this->manager->newQuery();
+
         // preload resource, comment 101 has an author => people-12
-        $query->resources()->add(
+        $query->resources()->addResources(
             $this->comments->find('101')
         );
 

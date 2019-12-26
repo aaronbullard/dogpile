@@ -214,7 +214,7 @@ class SomeObjectModel implements Resource
 
         // add author
         $authorIdent = $this->jsonapiData['relationships']['author']['data'];
-        $collection->add('author', ResourceIdentifier::create($authorIdent['type'], $authorIdent['id']));
+        $collection->addRelationships('author', ResourceIdentifier::create($authorIdent['type'], $authorIdent['id']));
 
         // add comments
         $commentIdentifiers = array_map(function($comment){
@@ -222,7 +222,7 @@ class SomeObjectModel implements Resource
         }, $this->jsonapiData['relationships']['comments']['data']);
 
 
-        $collection->add('comments', ...$commentIdentifiers);
+        $collection->addRelationships('comments', ...$commentIdentifiers);
 
 
         return $collection;

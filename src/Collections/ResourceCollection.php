@@ -8,10 +8,10 @@ class ResourceCollection extends Collection
 {
     public function __construct(array $resources = [])
     {
-        $this->add(...$resources);
+        $this->addResources(...$resources);
     }
 
-    public function add(Resource ...$resources): ResourceCollection
+    public function addResources(Resource ...$resources): ResourceCollection
     {
         foreach($resources as $r){
             $this->items[static::getKey($r->type(), $r->id())] = $r;

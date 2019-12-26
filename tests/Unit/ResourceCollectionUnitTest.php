@@ -19,10 +19,10 @@ class ResourceCollectionUnitTest extends TestCase
     {
         $models = $this->createResources(5, 'people');
 
-        $this->collection->add($models[0], $models[1]);
-        $this->collection->add($models[2], $models[3], $models[4]);
-        $this->collection->add($models[4]);
-        $this->collection->add(...$this->createResources(5, 'comments'));
+        $this->collection->addResources($models[0], $models[1]);
+        $this->collection->addResources($models[2], $models[3], $models[4]);
+        $this->collection->addResources($models[4]);
+        $this->collection->addResources(...$this->createResources(5, 'comments'));
 
         $this->assertCount(10, $this->collection);
         $this->assertEquals(10, $this->collection->count());
@@ -34,9 +34,9 @@ class ResourceCollectionUnitTest extends TestCase
     {
         $models = $this->createResources(5, 'people');
 
-        $this->collection->add(...$models)
+        $this->collection->addResources(...$models)
             ->each(function($person){
-                $person->relationships()->add('child', ResourceIdentifier::create('people', $person->id()));
+                $person->relationships()->addRelationships('child', ResourceIdentifier::create('people', $person->id()));
             });
 
         $this->assertCount(5, $this->collection->relationships()->identifiersFor('child'));
