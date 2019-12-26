@@ -8,7 +8,9 @@ class ResourceCollection extends Collection
 {
     public function __construct(array $resources = [])
     {
-        $this->addResources(...$resources);
+        $items = $this->getArrayableItems(array_values($resources));
+        
+        $this->addResources(...$items);
     }
 
     public function addResources(Resource ...$resources): ResourceCollection
@@ -16,6 +18,17 @@ class ResourceCollection extends Collection
         foreach($resources as $r){
             $this->items[static::getKey($r->type(), $r->id())] = $r;
         }
+
+        return $this;
+    }
+
+    public function merge($collection): ResourceCollection
+    {
+        if (!$collection instanceof ResourceCollection) {
+            throw new \InvalidArgumentException("Parameter 1 of ".get_class($this)."::merge must be of type ".get_class($this));
+        }
+
+        $this->addResources(...array_values($collection->all()));
 
         return $this;
     }
@@ -42,7 +55,7 @@ class ResourceCollection extends Collection
     public function relationships(): RelationshipCollection
     {
         return $this->reduce(function($carry, $resource){
-            return $carry->mergeRelationships($resource->relationships());
+            return $carry->merge($resource->relationships());
         }, new RelationshipCollection());
     }
 }

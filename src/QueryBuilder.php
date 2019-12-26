@@ -45,7 +45,7 @@ class QueryBuilder
 
     public function setRelationships(RelationshipCollection $relationships): QueryBuilder
     {
-        $this->relationships->mergeRelationships($relationships);
+        $this->relationships->merge($relationships);
 
         return $this;
     }
@@ -110,7 +110,7 @@ class QueryBuilder
         $resources = $this->queryResources($identifiers);
 
         // update ResourceCollection
-        $this->resources->addResources(...array_values($resources->all()));
+        $this->resources->merge($resources);
 
         // need ALL Resources (not just ones queried) for this path
         // need to update the relationships collection with the child related identifiers

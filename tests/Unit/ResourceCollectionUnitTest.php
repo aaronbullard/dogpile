@@ -42,4 +42,18 @@ class ResourceCollectionUnitTest extends TestCase
         $this->assertCount(5, $this->collection->relationships()->identifiersFor('child'));
         $this->assertEquals('child', $this->collection->relationships()->listRelationships()->first());
     }
+
+    /** @test */
+    public function it_merges_resource_collections()
+    {
+        $models = $this->createResources(5, 'people');
+        $this->collection->addResources(...$models);
+        $this->collection->merge(new ResourceCollection($this->createResources(3, 'comments')));
+
+        $this->assertCount(8, $this->collection);
+
+        // Disallow different types
+        $this->expectException(\InvalidArgumentException::class);
+        $this->collection->merge([1,2,3]);
+    }
 }

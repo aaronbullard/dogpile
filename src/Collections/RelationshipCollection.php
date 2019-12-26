@@ -25,17 +25,18 @@ class RelationshipCollection extends Collection
         return $this->keys()->sort()->values();
     }
 
-    public function mergeRelationships(RelationshipCollection $collection): RelationshipCollection
+    public function merge($collection): RelationshipCollection
     {
+        if (!$collection instanceof RelationshipCollection) {
+            throw new \InvalidArgumentException("Parameter 1 of ".get_class($this)."::merge must be of type ".get_class($this));
+        }
+
         $relTypes = $collection->listRelationships();
-try{
+
         foreach($relTypes as $type){
             $this->addRelationships($type, ...$collection->identifiersFor($type));
         }
-}
-catch(\Throwable $e){
-    dd($relTypes);
-}
+
         return $this;
     }
 

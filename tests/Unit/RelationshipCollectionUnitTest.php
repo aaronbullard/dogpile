@@ -51,7 +51,7 @@ class RelationshipCollectionUnitTest extends TestCase
         $secondary->addRelationships('comments', Ident::create('comments', '2'), Ident::create('comments', '3'));
 
         // Execute
-        $primary->mergeRelationships($secondary);
+        $primary->merge($secondary);
 
         $ids = $primary->identifiersFor('comments')
                 ->map(function($id){ return $id->id(); })
